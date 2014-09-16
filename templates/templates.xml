@@ -1,0 +1,18 @@
+<templtes>
+<template name="ei18nClass" id="org.eclipse.jdt.ui.text.codetemplates.ei18nClass" description="EI18N Class Declaration" context="ei18nClass_context" enabled="true">package ${package_name};
+
+import org.eclipse.osgi.util.NLS;
+
+public final class ${type_name} extends NLS { 
+	private static final String BUNDLE_NAME="${package_name}.messages"; //$NON-NLS-1$
+
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private ${type_name}() {
+	}
+}</template>
+<template name="ei18nField" id="org.eclipse.jdt.ui.text.codetemplates.ei18nField" description="EI18N Field Declaration" context="ei18nField_context" enabled="true">public static String ${field};</template>
+</templtes>

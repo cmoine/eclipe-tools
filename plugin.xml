@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <!-- ***************************************************************
+                             EI18N
+   ********************************************************************-->
+   <extension-point id="org.eclipse.etools.ei18n.impex" name="org.eclipse.etools.ei18n.impex" schema="schema/org.eclipse.etools.ei18n.impex.exsd"/>
+   <extension-point id="org.eclipse.etools.ei18n.translator" name="org.eclipse.etools.ei18n.translator" schema="schema/org.eclipse.etools.ei18n.translator.exsd"/>
+   <extension-point id="org.eclipse.etools.ei18n.javaMapping" name="org.eclipse.etools.ei18n.javaMapping" schema="schema/org.eclipse.etools.ei18n.javaMapping.exsd"/>
+   <extension
+         id="I18NBuilder"
+         name="i18n Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="org.eclipse.etools.ei18n.builder.I18NBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="I18NNature"
+         name="i18n Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.etools.ei18n.builder.I18NNature">
+         </run>
+      </runtime>
+      <builder
+            id="org.eclipse.etools.ei18n.I18NBuilder">
+      </builder>
+   </extension>
+   <!-- <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="org.eclipse.etools.ei18n.contribution1"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="org.eclipse.etools.ei18n.builder.ToggleNatureAction"
+               enablesFor="+"
+               id="org.eclipse.etools.ei18n.addRemoveNatureAction"
+               label="Add/Remove i18n Nature"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+   </extension> -->
+   <extension
+         id="propertiesProblem"
+         name="NLS Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.marker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
+      <attribute
+            name="locale">
+      </attribute>
+   </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="toc.xml"
+            primary="true">
+      </toc>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.eclipse.etools.ei18n.markers.MarkerResolutionGenerator"
+            markerType="org.eclipse.etools.ei18n.xmlProblem">
+      </markerResolutionGenerator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.eclipse.etools.ei18n"
+            name="EI18N">
+      </category>
+      <view
+            category="org.eclipse.etools.ei18n"
+            class="org.eclipse.etools.ei18n.views.EI18NProblemView"
+            icon="icons/ei18n/localizedProperties.png"
+            id="org.eclipse.etools.ei18n.views.EI18NProblemView"
+            name="EI18N Problems"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.team.ui.synchronizeParticipants">
+      <participant
+            class="org.eclipse.etools.ei18n.synchronize.EI18NSynchronizeParticipant"
+            icon="icons/ei18n/localizedProperties.png"
+            id="org.eclipse.etools.ei18n.synchronize.EI18NSynchronizeParticipant"
+            name="Ei18n"
+            persistent="false">
+      </participant>
+   </extension>
+   <!-- <extension
+         point="org.eclipse.team.ui.synchronizeWizards">
+      <wizard
+            class="org.eclipse.etools.ei18n.synchronize.EI18NConfigurationWizard"
+            description="description"
+            icon="icons/localizedProperties.png"
+            id="org.eclipse.etools.ei18n.synchronize.EI18NConfigurationWizard"
+            name="Ei18n">
+      </wizard>
+   </extension> -->
+   <!-- <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <dynamic
+               class="org.eclipse.etools.ei18n.EI18NContributionItem"
+               id="org.eclipse.etools.ei18n.dynamic1">
+         </dynamic>
+      </menuContribution>
+   </extension> -->
+   <extension
+         point="org.eclipse.ui.exportWizards">
+      <category
+            id="org.eclipse.etools.ei18n.category.ei18n"
+            name="e-i18n">
+      </category>
+      <wizard
+            category="org.eclipse.etools.ei18n.category.ei18n"
+            class="org.eclipse.etools.ei18n.wizards.ExportWizardEi18n"
+            icon="icons/ei18n/localizedProperties.png"
+            id="org.eclipse.etools.ei18n.wizard.export"
+            name="Export e-i18n">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            id="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            name="e-I18N">
+      </page>
+      <page
+            category="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            class="org.eclipse.etools.ei18n.preferences.BingPreferencePage"
+            id="org.eclipse.etools.ei18n.preferences.BingPreferencePage"
+            name="BING Translator">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.etools.ei18n.preferences.EI18NPreferenceInitializer">
+      </initializer>
+   </extension>
+   <!-- <extension
+         point="org.eclipse.jdt.ui.quickFixProcessors">
+      <quickFixProcessor
+            class="org.eclipse.etools.ei18n.correction.EI18NQuickFixProcessor"
+            id="org.eclipse.etools.ei18n.quickFixProcessor">
+      </quickFixProcessor>
+   </extension> -->
+   <extension
+         point="org.eclipse.jdt.ui.quickAssistProcessors">
+      <quickAssistProcessor
+            class="org.eclipse.etools.ei18n.correction.EI18NQuickAssistProcessor"
+            id="org.eclipse.etools.ei18n.quickAssistProcessor">
+      </quickAssistProcessor>
+   </extension>
+   <extension
+         point="org.eclipse.ltk.core.refactoring.moveParticipants">
+      <moveParticipant
+            class="org.eclipse.etools.ei18n.participants.EI18NMoveParticipant"
+            id="org.eclipse.etools.ei18n.participants.EI18NMoveParticipant"
+            name="EI18N Move">
+         <enablement></enablement>
+      </moveParticipant>
+   </extension>
+   <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+      <renameParticipant
+            class="org.eclipse.etools.ei18n.participants.EI18NRenameParticipant"
+            id="org.eclipse.etools.ei18n.participants.EI18NRenameParticipant"
+            name="EI18N Rename">
+         <enablement></enablement>
+      </renameParticipant>
+   </extension>
+   <extension
+         point="org.eclipse.etools.ei18n.impex">
+      <!-- <impex
+            class="org.eclipse.etools.ei18n.impex.NativeImpex"
+            extension="ei18n"
+            id="native"
+            name="Native">
+      </impex> -->
+      <impex
+            class="org.eclipse.etools.ei18n.impex.ExcelImpex"
+            extension="xls"
+            id="excel"
+            name="Excel">
+      </impex>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.etools.ei18n.editors.PropertiesEditorPart"
+            default="true"
+            filenames="messages.properties,plugin.properties"
+            icon="icons/ei18n/localizedProperties.png"
+            id="org.eclipse.etools.ei18n.editors.PropertiesEditorPart"
+            name="EI18N">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.etools.ei18n.translator">
+      <translator
+            class="org.eclipse.etools.ei18n.services.BingTranslatorService"
+            description="To get your Bing App ID, visit &lt;a href=&quot;http://www.bing.com/developers/appids.aspx&quot;&gt;http://www.bing.com/developers/appids.aspx&lt;/a&gt;, and sign in with your Windows Live ID."
+            id="org.eclipse.etools.ei18n.services.BingTranslatorService"
+            name="Bing Translator">
+      </translator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerSupport">
+      <markerContentGenerator
+            id="org.eclipse.etools.ei18n.markerContentGenerator"
+            name="EI18N Marker Content Generator">
+         <!-- <markerFieldReference
+               id="org.eclipse.ui.ide.completionField"
+               visible="true">
+         </markerFieldReference>
+         <markerFieldReference
+               id="org.eclipse.ui.ide.priorityField"
+               visible="true">
+         </markerFieldReference> -->
+         <markerFieldReference
+               id="org.eclipse.ui.ide.severityAndDescriptionField"
+               visible="true">
+         </markerFieldReference>
+         <markerFieldReference
+               id="org.eclipse.ui.ide.resourceField"
+               visible="true">
+         </markerFieldReference>
+         <markerFieldReference
+               id="org.eclipse.ui.ide.pathField"
+               visible="true">
+         </markerFieldReference>
+         <markerFieldReference
+               id="org.eclipse.ui.ide.locationField"
+               visible="false">
+         </markerFieldReference>
+         <markerFieldReference
+               id="org.eclipse.etools.ei18n.markers.EI18NMarkerField"
+               visible="true">
+         </markerFieldReference>
+         <markerFieldConfiguration
+               enabled="true"
+               id="org.eclipse.etools.ei18n.markerGroupingEntry1"
+               name="Non-externalized string literal"
+               values="org.eclipse.etools.ei18n.markers.NonExternalizedStringLiteralFiltersContributionParameters">
+         </markerFieldConfiguration>
+         <markerFieldConfiguration
+               enabled="true"
+               id="org.eclipse.etools.ei18n.markerGroupingEntry2"
+               name="EI18N"
+               values="org.eclipse.etools.ei18n.markers.EI18NFiltersContributionParameters">
+         </markerFieldConfiguration>
+         <markerTypeReference
+               id="org.eclipse.core.resources.marker">
+         </markerTypeReference>
+      </markerContentGenerator>
+      <markerField
+            class="org.eclipse.ui.internal.views.markers.MarkerTypeField"
+            filterClass="org.eclipse.etools.ei18n.markers.EI18NMarkerFieldFilter"
+            id="org.eclipse.etools.ei18n.markers.EI18NMarkerField"
+            name="Type">
+      </markerField>
+      <markerGroupingEntry
+            id="org.eclipse.etools.ei18n.markerGroupingEntry1"
+            label="label"
+            priority="5">
+      </markerGroupingEntry>
+      <markerGroupingEntry
+            id="org.eclipse.etools.ei18n.markerGroupingEntry2"
+            label="label"
+            priority="10">
+      </markerGroupingEntry>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.etools.ei18n.views.EI18NProblemView">
+         <menu
+               id="org.eclipse.ui.ide.allMarkers.filtersMenu"
+               label="View Menu">
+            <dynamic
+                  class="org.eclipse.ui.internal.views.markers.FiltersContribution"
+                  id="org.eclipse.ui.ide.filtersContribution">
+            </dynamic>
+         </menu>
+       </menuContribution>
+    </extension>
+   <extension
+         point="org.eclipse.etools.ei18n.javaMapping">
+      <mapping
+            class="org.eclipse.etools.ei18n.mapping.InjectionMapping"
+            id="org.eclipse.etools.ei18n.injection"
+            name="Value Injection (Eclipse NLS)">
+      </mapping>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.eclipse.etools.ei18n.properties.EI18nPropertyPage"
+            id="org.eclipse.etools.ei18n.properties.samplePropertyPage"
+            name="e-I18N">
+         <enabledWhen>
+            <instanceof
+                  value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <!-- <template
+            autoinsert="true"
+            contextTypeId="java-members"
+            id="org.eclipse.etools.ei18n.template1"
+            name="EI18N">
+         <pattern>${package_declaration}
+
+import org.eclipse.osgi.util.NLS;
+
+public class Messages extends NLS {
+
+	static {
+		// initialize resource bundle
+		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	private Messages() {
+	}
+}
+         </pattern>
+      </template> -->
+      <!-- <contextType
+            class="org.eclipse.jdt.internal.corext.template.java.JavaContextType"
+            id="org.eclipse.etools.ei18n.contextType1"
+            name="EI18N"
+            registryId="org.eclipse.jdt.ui.CompilationUnitEditor">
+      </contextType> -->
+      <include
+            file="templates/templates.xml">
+      </include>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.etools.ei18n.EI18NStartup">
+      </startup>
+   </extension>
+   <!-- <extension
+         point="org.eclipse.ui.ide.markerImageProviders">
+      <imageprovider
+            class="org.eclipse.ui.internal.ide.ProblemImageProvider"
+            id="org.eclipse.etools.ei18n.imageprovider1"
+            markertype="org.eclipse.etools.ei18n.xmlProblem">
+      </imageprovider>
+   </extension> -->
+   
+ <!-- ***************************************************************
+                         EFavorites
+   ********************************************************************-->
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="org.eclipse.etools.efavorites.actionSet3"
+            label="e-Favorites">
+         <action
+               class="org.eclipse.etools.efavorites.actions.EFavoritesAction"
+               icon="icons/enabled-star.png"
+               id="org.eclipse.etools.efavorites.actions.EFavoritesAction"
+               label="Favorites"
+               style="pulldown"
+               toolbarPath="Normal/additions">
+         </action>
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="org.eclipse.etools.efavorites.editorContribution1"
+            targetID="org.eclipse.etools.efavorites.editorContribution1">
+      </editorContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.etools.efavorites.EFavoritesStartup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.etools.efavorites.category1"
+            defaultHandler="org.eclipse.etools.efavorites.handlers.EFavoritesHandler"
+            id="org.eclipse.etools.efavorites.command1"
+            name="Open Favorites">
+      </command>
+      <category
+            id="org.eclipse.etools.efavorites.category1"
+            name="EFavorites">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.eclipse.etools.efavorites.command1"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+SHIFT+E">
+      </key>
+   </extension>
+
+  <!-- ***************************************************************
+                             CODE ANALYSIS
+   ********************************************************************-->
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.etools.codeanalysis.views.ResultView"
+            id="org.eclipse.etools.codeanalysis.ResultView"
+            name="Analysis Result"
+            restorable="true">
+      </view>
+   </extension>
+    
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.etools.codeanalysis.handler.CalculateUsage"
+            id="org.eclipse.etools.codeanalysis.calculateUsage"
+            name="Calculate method usage">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+         <command
+               commandId="org.eclipse.etools.codeanalysis.calculateUsage"
+               label="Calculate method usage"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+</plugin>
