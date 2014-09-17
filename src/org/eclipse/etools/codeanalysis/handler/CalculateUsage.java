@@ -33,6 +33,7 @@ public class CalculateUsage extends AbstractHandler {
 		}
 		final Object firstElement = selection.getFirstElement();
 		if (!(firstElement instanceof IJavaProject)) {
+            MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "Information", "Only works on Java Projects");
 			return null;
 		}
 		

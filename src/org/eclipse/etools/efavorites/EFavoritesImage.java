@@ -11,9 +11,10 @@ import org.eclipse.swt.graphics.Image;
  * @author Christophe Moine
  */
 public enum EFavoritesImage {
-    ENABLED_STAR_16("/icons/efavoites/enabled-star.gif"), //$NON-NLS-1$
-    DISABLED_STAR_16("/icons/efavoites/disabled-star.gif"), //$NON-NLS-1$
-    PREFERENCES_16("/icons/efavoites/preferences.gif"); //$NON-NLS-1$
+    TRASH_16("/icons/efavorites/trash.png"), //$NON-NLS-1$
+    ENABLED_STAR_16("/icons/efavorites/enabled-star.gif"), //$NON-NLS-1$
+    DISABLED_STAR_16("/icons/efavorites/disabled-star.gif"), //$NON-NLS-1$
+    PREFERENCES_16("/icons/efavorites/preferences.gif"); //$NON-NLS-1$
 
 	private static final ImageRegistry IMAGE_REGISTRY=Activator.getDefault().getImageRegistry();
 

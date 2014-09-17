@@ -68,11 +68,18 @@
             primary="true">
       </toc>
    </extension>
-   <extension
+   <!-- <extension
          point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
             class="org.eclipse.etools.ei18n.markers.MarkerResolutionGenerator"
             markerType="org.eclipse.etools.ei18n.xmlProblem">
+      </markerResolutionGenerator>
+   </extension> -->
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.eclipse.etools.efavorites.correction.EFavoritesMarkerResolutionGenerator"
+            markerType="org.eclipse.jdt.core.problem">
       </markerResolutionGenerator>
    </extension>
    <extension
@@ -167,6 +174,10 @@
       <quickAssistProcessor
             class="org.eclipse.etools.ei18n.correction.EI18NQuickAssistProcessor"
             id="org.eclipse.etools.ei18n.quickAssistProcessor">
+      </quickAssistProcessor>
+      <quickAssistProcessor
+            class="org.eclipse.etools.efavorites.correction.EFavoritesQuickFix"
+            id="org.eclipse.etools.efavorites.correction.EFavoritesQuickFix">
       </quickAssistProcessor>
    </extension>
    <extension
