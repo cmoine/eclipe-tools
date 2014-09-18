@@ -68,18 +68,11 @@
             primary="true">
       </toc>
    </extension>
-   <!-- <extension
+   <extension
          point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
             class="org.eclipse.etools.ei18n.markers.MarkerResolutionGenerator"
             markerType="org.eclipse.etools.ei18n.xmlProblem">
-      </markerResolutionGenerator>
-   </extension> -->
-   <extension
-         point="org.eclipse.ui.ide.markerResolution">
-      <markerResolutionGenerator
-            class="org.eclipse.etools.efavorites.correction.EFavoritesMarkerResolutionGenerator"
-            markerType="org.eclipse.jdt.core.problem">
       </markerResolutionGenerator>
    </extension>
    <extension
@@ -467,5 +460,18 @@ public class Messages extends NLS {
                style="push">
          </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="org.eclipse.etools.efavorites.EFavoritesMarkerPropertyPage"
+            id="org.eclipse.etools.efavorites.EFavoritesMarkerPropertyPage"
+            name="e-tools">
+            <enabledWhen>
+            <adapt
+                  type="org.eclipse.core.resources.IMarker">
+            </adapt>
+         </enabledWhen>
+      </page>
    </extension>
 </plugin>

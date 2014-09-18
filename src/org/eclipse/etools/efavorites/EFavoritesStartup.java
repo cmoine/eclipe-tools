@@ -8,6 +8,8 @@ import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceNode;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
@@ -30,8 +32,21 @@ public class EFavoritesStartup implements IStartup {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 Shell shell=PlatformUI.getWorkbench().getModalDialogShellProvider().getShell();
+                shell.addControlListener(new ControlListener() {
+
+                    public void controlResized(ControlEvent e) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    public void controlMoved(ControlEvent e) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
                 final PreferenceDialog dialog=PreferencesUtil.createPreferenceDialogOn(shell, null, null, null);
-                dialog.getShell().addListener(SWT.Show, new Listener() {
+                Shell shell2=dialog.getShell();
+                shell2.addListener(SWT.Show, new Listener() {
                     private final IDialogSettings settings=Activator.getDefault().getDialogSettings();
 
                     public void handleEvent(Event event) {

@@ -50,7 +50,7 @@ public class EFavoritesQuickFix implements IQuickAssistProcessor {
                     //                    int charEnd=(Integer) marker.getAttribute(IMarker.CHAR_END);
                     if (context.getSelectionOffset() >= location.getOffset() && context.getSelectionOffset() < location.getOffset() + location.getLength()) {
                         // Marker !!!
-                        if (location.getProblemId() /* marker.getAttribute(IJavaModelMarker.ID, -1) */== IProblem.UndefinedType) {
+                        if (location.getProblemId() == IProblem.UndefinedType || location.getProblemId() == IProblem.UndefinedName) {
                             //                            String type=((String) marker.getAttribute(IJavaModelMarker.ARGUMENTS)).substring(2);
                             String type=location.getProblemArguments()[0];
 
@@ -80,5 +80,4 @@ public class EFavoritesQuickFix implements IQuickAssistProcessor {
 
         return null;
     }
-
 }
