@@ -140,7 +140,7 @@
       <page
             class="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
             id="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
-            name="e-I18N">
+            name="Etools">
       </page>
       <page
             category="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
@@ -148,11 +148,20 @@
             id="org.eclipse.etools.ei18n.preferences.BingPreferencePage"
             name="BING Translator">
       </page>
+      <page
+            category="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            class="org.eclipse.etools.eshell.preferences.EShellPreferencePage"
+            id="eclipe-tools.page1"
+            name="EShell">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="org.eclipse.etools.ei18n.preferences.EI18NPreferenceInitializer">
+      </initializer>
+      <initializer
+            class="org.eclipse.etools.eshell.preferences.EShellPreferenceInitializer">
       </initializer>
    </extension>
    <!-- <extension
@@ -473,5 +482,106 @@ public class Messages extends NLS {
             </adapt>
          </enabledWhen>
       </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+         <command
+               commandId="net.cmoine.xsdgen.command1"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <iterate>
+                  <adapt
+                        type="org.eclipse.core.resources.IFile">
+                     <test
+                           property="org.eclipse.core.resources.name"
+                           value="*.xml">
+                     </test>
+                  </adapt>
+               </iterate>
+            </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.etools.xsdgen.XsdGenHandler"
+            id="net.cmoine.xsdgen.command1"
+            name="Generate XSD">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.etools.eshell.category1"
+            name="EShell">
+      </category>
+      <command
+            categoryId="org.eclipse.etools.eshell.category1"
+            id="org.eclipse.etools.eshell.shellOpen"
+            name="EShell Open">
+      </command>
+      <command
+            categoryId="org.eclipse.etools.eshell.category1"
+            id="org.eclipse.etools.eshell.shellExplore"
+            name="EShell Explore">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.etools.eshell.EShellCommand"
+            commandId="org.eclipse.etools.eshell.shellOpen">
+      </handler>
+      <handler
+            class="org.eclipse.etools.eshell.EShellCommand"
+            commandId="org.eclipse.etools.eshell.shellExplore">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+         <menuContribution
+            locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
+         <menu
+               id="org.eclipse.plugins.etools.eshell.menu"
+               label="Etool">
+            <command
+                  commandId="org.eclipse.etools.eshell.shellExplore"
+                  icon="icons/eshell/fldr_obj.gif"
+                  label="Explore..."
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.etools.eshell.shellOpen"
+                  icon="icons/eshell/easyshell.gif"
+                  label="Command Line..."
+                  style="push">
+            </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activePart">
+                  <test
+                        forcePluginActivation="true"
+                        property="org.eclipse.etools.eshell.EShellPropertyTester.hasResourceSelection">
+                  </test>
+               </with>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.etools.eshell.EShellPropertyTester"
+            id="org.eclipse.etools.eshell.EShellPropertyTester"
+            namespace="org.eclipse.etools.eshell.EShellPropertyTester"
+            properties="hasResourceSelection"
+            type="org.eclipse.ui.IWorkbenchPart">
+      </propertyTester>
    </extension>
 </plugin>

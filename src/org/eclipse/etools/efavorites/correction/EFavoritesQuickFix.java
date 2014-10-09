@@ -29,10 +29,6 @@ public class EFavoritesQuickFix implements IQuickAssistProcessor {
     }
 
     public IJavaCompletionProposal[] getAssists(IInvocationContext context, IProblemLocation[] locations) throws CoreException {
-        //        if (hasAssists(context)) {
-        //            EFavoritesProposal proposal=new EFavoritesProposal(context);
-        //            return new IJavaCompletionProposal[] { proposal };
-        //        }
         try {
             if (context.getCoveringNode() instanceof SimpleName) {
                 List<IJavaCompletionProposal> proposals=new ArrayList<IJavaCompletionProposal>();
@@ -44,14 +40,11 @@ public class EFavoritesQuickFix implements IQuickAssistProcessor {
 
                 int kind=ASTResolving.getPossibleTypeKinds(node, JavaModelUtil.is50OrHigher(project));
 
-                //                IMarker[] markers=file.findMarkers("org.eclipse.jdt.core.problem", true, IResource.DEPTH_ZERO);
                 for (IProblemLocation location : locations) {
-                    //                    int charStart=(Integer) marker.getAttribute(IMarker.CHAR_START);
-                    //                    int charEnd=(Integer) marker.getAttribute(IMarker.CHAR_END);
                     if (context.getSelectionOffset() >= location.getOffset() && context.getSelectionOffset() < location.getOffset() + location.getLength()) {
                         // Marker !!!
-                        if (location.getProblemId() == IProblem.UndefinedType || location.getProblemId() == IProblem.UndefinedName) {
-                            //                            String type=((String) marker.getAttribute(IJavaModelMarker.ARGUMENTS)).substring(2);
+                        if (location.getProblemId() == IProblem.UndefinedType || location.getProblemId() == IProblem.UndefinedName
+                                || location.getProblemId() == IProblem.UnresolvedVariable) {
                             String type=location.getProblemArguments()[0];
 
                             context.getCoveringNode();
@@ -62,7 +55,6 @@ public class EFavoritesQuickFix implements IQuickAssistProcessor {
                                     String fullName=elem.getName();
                                     String simpleName=StringUtils.substringAfterLast(fullName, ".");
                                     if (simpleName.equals(node.getIdentifier())) {
-                                        //                                        System.out.println("EFavoritesQuickFix.hasAssists() " + fullName);
                                         proposals.add(new EFavoritesProposal(fullName));
                                     }
                                 }
