@@ -1,4 +1,4 @@
-package org.eclipse.etools.eshell;
+package org.eclipse.etools;
 
 import java.io.File;
 
@@ -12,7 +12,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPart;
 
-public class ResourceUtils {
+public class FileUtils {
     public static ISelection getResourceSelection(IWorkbenchPart part) {
         ISelection selection=null;
         if (part != null)

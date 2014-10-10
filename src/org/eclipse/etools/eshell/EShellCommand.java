@@ -16,7 +16,6 @@ public class EShellCommand extends AbstractHandler {
         IWorkbenchPart activePart=HandlerUtil.getActivePart(event);
         EShellAction action=EShellPropertyTester.hasResourceSelection(activePart);
         if (action != null) {
-            //            EasyShellMyAction act=new EasyShellMyAction(event.getCommand().getId());
             ACTION.setId(event.getCommand().getId());
             action.run(ACTION);
         }

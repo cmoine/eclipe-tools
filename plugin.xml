@@ -138,18 +138,18 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
-            id="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            class="org.eclipse.etools.EtoolsPreferencePage"
+            id="org.eclipse.etools.EtoolsPreferencePage"
             name="Etools">
       </page>
       <page
-            category="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            category="org.eclipse.etools.EtoolsPreferencePage"
             class="org.eclipse.etools.ei18n.preferences.BingPreferencePage"
             id="org.eclipse.etools.ei18n.preferences.BingPreferencePage"
             name="BING Translator">
       </page>
       <page
-            category="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            category="org.eclipse.etools.EtoolsPreferencePage"
             class="org.eclipse.etools.eshell.preferences.EShellPreferencePage"
             id="eclipe-tools.page1"
             name="EShell">
@@ -442,33 +442,12 @@ public class Messages extends NLS {
                              CODE ANALYSIS
    ********************************************************************-->
    <extension
-         point="org.eclipse.ui.views">
-      <view
-            class="org.eclipse.etools.codeanalysis.views.ResultView"
-            id="org.eclipse.etools.codeanalysis.ResultView"
-            name="Analysis Result"
-            restorable="true">
-      </view>
-   </extension>
-    
-   <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="org.eclipse.etools.codeanalysis.handler.CalculateUsage"
+            defaultHandler="org.eclipse.etools.codeanalysis.FindDeadCodeHandler"
             id="org.eclipse.etools.codeanalysis.calculateUsage"
-            name="Calculate method usage">
+            name="Find Dead Code">
       </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
-         <command
-               commandId="org.eclipse.etools.codeanalysis.calculateUsage"
-               label="Calculate method usage"
-               style="push">
-         </command>
-      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
@@ -482,29 +461,6 @@ public class Messages extends NLS {
             </adapt>
          </enabledWhen>
       </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any?after=additions">
-         <command
-               commandId="net.cmoine.xsdgen.command1"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <iterate>
-                  <adapt
-                        type="org.eclipse.core.resources.IFile">
-                     <test
-                           property="org.eclipse.core.resources.name"
-                           value="*.xml">
-                     </test>
-                  </adapt>
-               </iterate>
-            </visibleWhen>
-         </command>
-      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -554,23 +510,64 @@ public class Messages extends NLS {
                   icon="icons/eshell/fldr_obj.gif"
                   label="Explore..."
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="activePart">
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.etools.eshell.EShellPropertyTester.hasResourceSelection">
+                     </test>
+                  </with>
+               </visibleWhen>
             </command>
             <command
                   commandId="org.eclipse.etools.eshell.shellOpen"
                   icon="icons/eshell/easyshell.gif"
                   label="Command Line..."
                   style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <with
+                        variable="activePart">
+                     <test
+                           forcePluginActivation="true"
+                           property="org.eclipse.etools.eshell.EShellPropertyTester.hasResourceSelection">
+                     </test>
+                  </with>
+               </visibleWhen>
             </command>
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="activePart">
-                  <test
-                        forcePluginActivation="true"
-                        property="org.eclipse.etools.eshell.EShellPropertyTester.hasResourceSelection">
-                  </test>
-               </with>
-            </visibleWhen>
+            <separator
+                  name="eclipe-tools.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="net.cmoine.xsdgen.command1"
+                  icon="icons/xsdgen/xml.png"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate>
+                     <adapt
+                           type="org.eclipse.core.resources.IFile">
+                        <test
+                              property="org.eclipse.core.resources.name"
+                              value="*.xml">
+                        </test>
+                     </adapt>
+                  </iterate>
+               </visibleWhen>
+            </command>
+            <separator
+                  name="eclipe-tools.separator2"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.etools.codeanalysis.calculateUsage"
+                  icon="icons/codeanalysis/dead.png"
+                  label="Find Dead Code"
+                  style="push">
+            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -583,5 +580,13 @@ public class Messages extends NLS {
             properties="hasResourceSelection"
             type="org.eclipse.ui.IWorkbenchPart">
       </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.search.searchResultViewPages">
+      <viewPage
+            class="org.eclipse.jdt.internal.ui.search.JavaSearchResultPage"
+            id="eclipe-tools.viewPage1"
+            searchResultClass="org.eclipse.etools.codeanalysis.EtoolsSearchResult">
+      </viewPage>
    </extension>
 </plugin>

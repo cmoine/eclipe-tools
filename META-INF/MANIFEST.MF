@@ -28,7 +28,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.compare.core,
  org.eclipse.ui.forms,
  org.eclipse.core.expressions,
- org.eclipse.rap.ui
+ org.eclipse.search
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
