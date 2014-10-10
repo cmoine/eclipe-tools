@@ -188,7 +188,16 @@
             class="org.eclipse.etools.ei18n.participants.EI18NMoveParticipant"
             id="org.eclipse.etools.ei18n.participants.EI18NMoveParticipant"
             name="EI18N Move">
-         <enablement></enablement>
+         <enablement>
+              <with variable="affectedNatures">
+                <iterate operator="or">
+                  <equals value="org.eclipse.jdt.core.javanature"/>
+                </iterate>
+              </with>
+              <with variable="element">
+                <instanceof value="org.eclipse.jdt.core.IField"/>
+              </with>
+         </enablement>
       </moveParticipant>
    </extension>
    <extension
@@ -197,7 +206,16 @@
             class="org.eclipse.etools.ei18n.participants.EI18NRenameParticipant"
             id="org.eclipse.etools.ei18n.participants.EI18NRenameParticipant"
             name="EI18N Rename">
-         <enablement></enablement>
+         <enablement>
+              <with variable="affectedNatures">
+                <iterate operator="or">
+                  <equals value="org.eclipse.jdt.core.javanature"/>
+                </iterate>
+              </with>
+              <with variable="element">
+                <instanceof value="org.eclipse.jdt.core.IField"/>
+              </with>
+         </enablement>
       </renameParticipant>
    </extension>
    <extension
@@ -218,11 +236,11 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.eclipse.etools.ei18n.editors.PropertiesEditorPart"
+            class="org.eclipse.etools.ei18n.editors.EI18NEditorPart"
             default="true"
             filenames="messages.properties,plugin.properties"
             icon="icons/ei18n/localizedProperties.png"
-            id="org.eclipse.etools.ei18n.editors.PropertiesEditorPart"
+            id="org.eclipse.etools.ei18n.editors.EI18NEditorPart"
             name="EI18N">
       </editor>
    </extension>
@@ -588,5 +606,15 @@ public class Messages extends NLS {
             id="eclipe-tools.viewPage1"
             searchResultClass="org.eclipse.etools.codeanalysis.EtoolsSearchResult">
       </viewPage>
+   </extension>
+   <extension
+         point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
+      <hyperlinkDetector
+            activate="true"
+            class="org.eclipse.etools.ei18n.EI18NHyperlinkDetector"
+            id="org.eclipse.etools.ei18n.EI18NHyperlinkDetector"
+            name="EI18N"
+            targetId="org.eclipse.jdt.ui.javaCode">
+      </hyperlinkDetector>
    </extension>
 </plugin>

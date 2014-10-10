@@ -37,18 +37,18 @@ public class Line implements Comparable<Line> {
     //        return map.keySet();
     //    }
 
-    @Override
-    public boolean equals(Object arg0) {
-        if (arg0 instanceof Line && arg0 != null && string != null)
-            return string.equals(((Line) arg0).string);
-
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return string.hashCode();
-    }
+    //    @Override
+    //    public boolean equals(Object arg0) {
+    //        if (arg0 instanceof Line && arg0 != null && string != null)
+    //            return string.equals(((Line) arg0).string);
+    //
+    //        return false;
+    //    }
+    //
+    //    @Override
+    //    public int hashCode() {
+    //        return string.hashCode();
+    //    }
 
     public int compareTo(Line o) {
         if (string == null)

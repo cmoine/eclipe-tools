@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -41,7 +40,6 @@ import org.eclipse.etools.ei18n.util.MappingPreference;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.jdt.internal.ui.propertiesfileeditor.PropertiesFileEditor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.viewers.CellEditor;
@@ -81,19 +79,20 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.editors.text.TextEditor;
-import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.part.MultiPageSelectionProvider;
-import org.eclipse.ui.texteditor.MarkerUtilities;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class PropertiesEditorPart extends MultiPageEditorPart implements IGotoMarker {
+public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMarker
+{
+    public static final String ID=EI18NEditorPart.class.getName();
+
     private static final String EI18N="EI18N"; //$NON-NLS-1$
     //    private IFile file;
     //    private final List<IFile> localFiles=Lists.newArrayList();
@@ -481,8 +480,8 @@ public class PropertiesEditorPart extends MultiPageEditorPart implements IGotoMa
             }
 
             public Object getValue(Object element, String property) {
-                if (property == EI18NComposite.KEY_COLUMN_PROPERTY)
-                    return ((StringBuffer) element).toString();
+                //                if (property == EI18NComposite.KEY_COLUMN_PROPERTY)
+                //                    return ((Line) element).toString();
 
                 Line key=(Line) element;
                 if (key.isNew())
@@ -842,9 +841,9 @@ public class PropertiesEditorPart extends MultiPageEditorPart implements IGotoMa
 
     private String getKeySelected() {
         if (oldPageIndex == 0) {
-            StringBuffer buffer=(StringBuffer) ((IStructuredSelection) ei18nComposite.getViewer().getSelection()).getFirstElement();
-            if (buffer != null)
-                return buffer.toString();
+            Line buffer=(Line) ((IStructuredSelection) ei18nComposite.getViewer().getSelection()).getFirstElement();
+            //            if (buffer != null)
+            //                return buffer.toString();
             // TODO CME
             //        } else if (oldPageIndex == 1 && cu != null) {
             //            int offset=((ITextSelection) ((ITextEditor) getEditor(oldPageIndex)).getSelectionProvider().getSelection()).getOffset();
@@ -942,36 +941,36 @@ public class PropertiesEditorPart extends MultiPageEditorPart implements IGotoMa
     }
 
     protected boolean containsKey(String str) {
-        for (Line buf : getKeys()) {
-            if (buf.getString().equalsIgnoreCase(str)) {
+        for (Line line : getKeys()) {
+            if (line.getString() != null && line.getString().equalsIgnoreCase(str)) {
                 return true;
             }
         }
         return false;
     }
 
-    public void gotoMarker(IMarker marker) {
-        int start=MarkerUtilities.getCharStart(marker);
-        int end=MarkerUtilities.getCharEnd(marker);
-        try {
-            TextEditor textEditor=infos.get(EMPTY).editor;
-            String keyName=textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).get(start, end - start);
-            select(keyName);
-        } catch (BadLocationException e) {
-            Activator.log(IStatus.ERROR, "Failed to GOTO", e); //$NON-NLS-1$
-        }
-        // EditorUtility.revealInEditor(javaEditor, start, end - start);
-        // for (TextEditor textEditor : editors) {
-        // EditorUtility.revealInEditor(textEditor, start, end - start);
-        // }
-    }
+    //    public void gotoMarker(IMarker marker) {
+    //        int start=MarkerUtilities.getCharStart(marker);
+    //        int end=MarkerUtilities.getCharEnd(marker);
+    //        try {
+    //            TextEditor textEditor=infos.get(EMPTY).editor;
+    //            String keyName=textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).get(start, end - start);
+    //            select(keyName);
+    //        } catch (BadLocationException e) {
+    //            Activator.log(IStatus.ERROR, "Failed to GOTO", e); //$NON-NLS-1$
+    //        }
+    //        // EditorUtility.revealInEditor(javaEditor, start, end - start);
+    //        // for (TextEditor textEditor : editors) {
+    //        // EditorUtility.revealInEditor(textEditor, start, end - start);
+    //        // }
+    //    }
 
-    private void select(String key) {
+    public void select(String key) {
         if (StringUtils.isNotEmpty(key)) {
             for (Line buf : getKeys()) {
                 if (buf.getString().equals(key)) {
-                    ei18nComposite.getViewer().setSelection(new StructuredSelection(buf));
-                    ei18nComposite.getViewer().reveal(buf);
+                    ei18nComposite.getViewer().setSelection(new StructuredSelection(buf), true);
+                    //                    ei18nComposite.getViewer().reveal(buf);
                 }
             }
         }
