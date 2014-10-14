@@ -44,8 +44,6 @@ public class FindDeadCodeHandler extends AbstractHandler {
             IResource res=(IResource) HandlerUtil.getActiveEditorChecked(event).getEditorInput().getAdapter(IFile.class);
             if (res != null)
                 files.add(res.getLocation().toFile());
-            //            else
-            //                selection=new StructuredSelection();
         } else {
             selection=(IStructuredSelection) rawSelection;
             for (Object o : selection.toArray()) {
@@ -66,8 +64,6 @@ public class FindDeadCodeHandler extends AbstractHandler {
 
         final List<ICompilationUnit> cus=new ArrayList<ICompilationUnit>();
         for (File file : files) {
-            //            File file=FileUtils.getResource(o);
-            //            if (file != null) {
             try {
                 IWorkspaceRoot root=ResourcesPlugin.getWorkspace().getRoot();
                 IResource res=null;
@@ -112,7 +108,6 @@ public class FindDeadCodeHandler extends AbstractHandler {
             Job job=new Job("Searching Dead Code...") { //$NON-NLS-1$
                 @Override
                 protected IStatus run(IProgressMonitor monitor) {
-                    //                    final List<MethodInformation> calculate=
                     monitor.beginTask("Searching Dead Code...", cus.size()); //$NON-NLS-1$
                     CodeAnalysis.calculate(cus, monitor);
                     monitor.done();
@@ -120,8 +115,6 @@ public class FindDeadCodeHandler extends AbstractHandler {
                     Display.getDefault().asyncExec(new Runnable() {
                         public void run() {
                             try {
-                            //                                final ResultView findView=(ResultView) HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().showView(ResultView.ID);
-                            //                                findView.setInput(calculate);
                                 SearchView view=(SearchView) HandlerUtil.getActiveWorkbenchWindow(event).getActivePage()
                                         .showView("org.eclipse.search.ui.views.SearchView");
                                 view.showSearchResult(CodeAnalysis.getSearchResult());

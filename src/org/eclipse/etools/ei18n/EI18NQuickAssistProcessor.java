@@ -1,4 +1,4 @@
-package org.eclipse.etools.ei18n.correction;
+package org.eclipse.etools.ei18n;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.dom.ASTNode;

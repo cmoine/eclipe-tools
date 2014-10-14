@@ -22,9 +22,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class EShellCommand extends AbstractHandler implements EShellPreferencesConstants {
-    //    private final IAction ACTION=new Action() {
-    //    };
-
     public Object execute(ExecutionEvent event) throws ExecutionException {
         IResource item=getResource(event);
         if (item == null) {
@@ -37,19 +34,13 @@ public class EShellCommand extends AbstractHandler implements EShellPreferencesC
 
             if (file.isFile())
                 file=file.getParentFile();
-            //            Object[] strs=new Object[] { file.getParent(), file.getPath() };
+
             String cmd=format(store.getString(OPEN_COMMAND), file.getAbsolutePath());
             Runtime.getRuntime().exec(cmd);
         } catch (Exception e) {
             Activator.logError("Failed opening command line", e); //$NON-NLS-1$
         }
-        //        IWorkbenchPart activePart=HandlerUtil.getActivePart(event);
-        //        EShellAction action=EShellPropertyTester.hasResourceSelection(activePart);
-        //        if (action != null) {
-        //            ACTION.setId(event.getCommand().getId());
-        //            action.setEvent(event);
-        //            action.run(ACTION);
-        //        }
+
         return null;
     }
 

@@ -1,4 +1,4 @@
-package org.eclipse.etools.ei18n.composite;
+package org.eclipse.etools.ei18n;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
@@ -10,7 +10,6 @@ import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.etools.ei18n.EI18NImage;
 import org.eclipse.etools.ei18n.editors.EditionLine;
 import org.eclipse.etools.ei18n.editors.Line;
 import org.eclipse.etools.ei18n.util.TranslationCellEditor;
@@ -147,12 +146,6 @@ public class EI18NComposite {
                 } else
                     super.updateContents(value);
             }
-
-            //            @Override
-            //            protected IFile getSelectedFile() {
-            //                // TODO Auto-generated method stub
-            //                return null;
-            //            }
         };
     }
 

@@ -90,13 +90,6 @@ public class LineProperties implements Iterable<String> {
         return lines.containsKey(key) ? lines.get(key).value : null;
     }
 
-    // public void setProperty(String key, String value) {
-    // if (lines.containsKey(key))
-    // lines.get(key).value=value;
-    // else
-    // lines.put(key, new LineInformation(null, null, value, -1, null));
-    // }
-
     public String getLine(String key) {
         return lines.containsKey(key) ? lines.get(key).originalLine : null;
     }
