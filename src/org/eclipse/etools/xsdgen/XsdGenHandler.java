@@ -10,7 +10,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.etools.Activator;
@@ -33,7 +32,7 @@ public class XsdGenHandler extends AbstractHandler {
                     System.setOut(oldOut);
                     xsdFile.create(new ByteArrayInputStream(baos.toByteArray()), true, new NullProgressMonitor());
                 } catch (Exception e) {
-                    Activator.log(IStatus.ERROR, "Failed generating XSD", e); //$NON-NLS-1$
+                    Activator.logError("Failed generating XSD", e); //$NON-NLS-1$
                 }
             }
         }

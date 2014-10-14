@@ -29,8 +29,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.forms,
  org.eclipse.core.expressions,
  org.eclipse.search,
- org.eclipse.ui.workbench.texteditor,
- org.eclipse.equinox.security
+ org.eclipse.ui.workbench.texteditor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,

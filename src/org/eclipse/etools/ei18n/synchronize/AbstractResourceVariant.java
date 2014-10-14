@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
 import org.eclipse.team.core.TeamException;
@@ -84,7 +83,7 @@ abstract class AbstractResourceVariant implements IResourceVariant {
                     stream=iFile.getContents();
                     actualLines=Arrays.asList(StringUtils.splitPreserveAllTokens(IOUtils.toString(stream), '\n'));
                 } catch (CoreException e) {
-                    Activator.log(IStatus.ERROR, "Failed to read " + iFile, e); //$NON-NLS-1$
+                    Activator.logError("Failed to read " + iFile, e); //$NON-NLS-1$
                 } finally {
                     IOUtils.closeQuietly(stream);
                 }
@@ -117,7 +116,7 @@ abstract class AbstractResourceVariant implements IResourceVariant {
                 return createStorage("ERROR"); //$NON-NLS-1$
             }
         } catch (IOException e) {
-            Activator.log(IStatus.ERROR, "Failed fetching member", e); //$NON-NLS-1$
+            Activator.logError("Failed fetching member", e); //$NON-NLS-1$
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             e.printStackTrace(new PrintWriter(baos));
             return createStorage("ERROR : " + e.getMessage() + IOUtils.LINE_SEPARATOR + baos); //$NON-NLS-1$

@@ -1,7 +1,5 @@
 package org.eclipse.etools.efavorites.actions;
 
-import static org.eclipse.core.runtime.IStatus.ERROR;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Stack;
@@ -182,25 +180,11 @@ public class EFavoritesAction implements IWorkbenchWindowPulldownDelegate {
                 IMAGE_LOADER.save(new Base64OutputStream(stream), SWT.IMAGE_GIF);
 				icon=new String(stream.toByteArray());
 			} catch (Throwable t) {
-				Activator.log(ERROR, "Failed to save image ", t); //$NON-NLS-1$
+                Activator.logError("Failed to save image ", t); //$NON-NLS-1$
 			}
 		}
         return file.getFullPath().toString() + (icon == null ? StringUtils.EMPTY : EFavorite.SEPARATOR + icon);
 	}
-
-    // public static EFavorite str2file(String file) {
-    // ImageData imageData=null;
-    // if (file.contains(SEPARATOR)) {
-    // byte[] data=StringUtils.substringAfter(file, SEPARATOR).getBytes();
-    // file=StringUtils.substringBefore(file, SEPARATOR);
-    // try {
-    // imageData=IMAGE_LOADER.load(new Base64InputStream(new ByteArrayInputStream(data)))[0];
-    // } catch (Throwable t) {
-    //				Activator.log(ERROR, "Failed to load image " + data.length + ":" + StringUtils.join(data), t); //$NON-NLS-1$ //$NON-NLS-2$
-    // }
-    // }
-    // return new EFavorite(, imageData);
-    // }
 
 	private String[] getFavorites() {
         String[] favorites=SETTINGS.getArray(FAVORITES);

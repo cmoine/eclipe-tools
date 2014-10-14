@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -136,7 +137,19 @@ public class Activator extends AbstractUIPlugin {
         return section;
     }
 
-    public static void log(int severity, String message, Throwable e) {
+    public static void logInfo(String message, Throwable e) {
+        log(IStatus.INFO, message, e);
+    }
+
+    public static void logWarning(String message, Throwable e) {
+        log(IStatus.WARNING, message, e);
+    }
+
+    public static void logError(String message, Throwable e) {
+        log(IStatus.ERROR, message, e);
+    }
+
+    private static void log(int severity, String message, Throwable e) {
         getDefault().getLog().log(new Status(severity, PLUGIN_ID, message, e));
     }
 

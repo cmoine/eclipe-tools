@@ -5,13 +5,11 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.etools.Activator;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.views.markers.MarkerFieldFilter;
 import org.eclipse.ui.views.markers.MarkerItem;
 import org.eclipse.ui.views.markers.MarkerSupportConstants;
-
-import org.eclipse.etools.Activator;
 
 public class EI18NMarkerFieldFilter extends MarkerFieldFilter {
 	private String markerType;
@@ -22,7 +20,7 @@ public class EI18NMarkerFieldFilter extends MarkerFieldFilter {
 		try {
 			return matchesType(item) && matchesContains(item);
 		} catch (CoreException e) {
-            Activator.log(IStatus.ERROR, "Failed to get marker type", e); //$NON-NLS-1$
+            Activator.logError("Failed to get marker type", e); //$NON-NLS-1$
 			return false;
 		}
 	}

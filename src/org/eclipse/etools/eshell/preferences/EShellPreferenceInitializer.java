@@ -8,7 +8,6 @@ public class EShellPreferenceInitializer extends AbstractPreferenceInitializer i
     @Override
     public void initializeDefaultPreferences() {
         IPreferenceStore store=Activator.getDefault().getPreferenceStore();
-        store.setDefault(OPEN_COMMAND, "cmd.exe /C start \"Etools\" /D {0} cmd.exe /K");
-        store.setDefault(EXPLORE_COMMAND, "explorer.exe /select, {1}");
+        store.setDefault(OPEN_COMMAND, "cmd.exe /C start \"Etools\" /D {0} cmd.exe /K"); //$NON-NLS-1$
     }
 }

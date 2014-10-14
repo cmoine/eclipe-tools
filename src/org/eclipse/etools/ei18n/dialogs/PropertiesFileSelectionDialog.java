@@ -83,7 +83,7 @@ public final class PropertiesFileSelectionDialog extends AbstractFileSelectionDi
                 getTreeViewer().setSelection(new StructuredSelection(newObj));
             }
         } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "", e);
+            Activator.logError("Failed creating button pressed", e); //$NON-NLS-1$
         }
     }
 }

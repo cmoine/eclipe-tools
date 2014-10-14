@@ -1,7 +1,6 @@
 package org.eclipse.etools.ei18n;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.editors.EI18NEditorPart;
 import org.eclipse.etools.ei18n.util.EI18NUtil;
@@ -46,7 +45,7 @@ public class EI18NHyperlink implements IHyperlink {
                     .openEditor(new FileEditorInput(res), EI18NEditorPart.ID, true, IWorkbenchPage.MATCH_ID | IWorkbenchPage.MATCH_INPUT);
             editorPart.select(key);
         } catch (PartInitException e) {
-            Activator.log(IStatus.ERROR, "Failed opening hyperlink", e); //$NON-NLS-1$
+            Activator.logError("Failed opening hyperlink", e); //$NON-NLS-1$
         }
     }
 }

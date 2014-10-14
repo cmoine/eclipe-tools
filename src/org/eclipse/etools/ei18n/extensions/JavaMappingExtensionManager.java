@@ -1,8 +1,5 @@
 package org.eclipse.etools.ei18n.extensions;
 
-import static org.eclipse.core.runtime.IStatus.ERROR;
-import static org.eclipse.core.runtime.IStatus.INFO;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -11,8 +8,8 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-
 import org.eclipse.etools.Activator;
+
 import com.google.common.collect.Lists;
 
 public class JavaMappingExtensionManager {
@@ -96,7 +93,7 @@ public class JavaMappingExtensionManager {
         IExtensionPoint extensionPoint=registry.getExtensionPoint(EXTENSION_ID);
 
         if (extensionPoint == null) {
-            Activator.log(INFO, "Aucune application definie", null); //$NON-NLS-1$
+            Activator.logInfo("Aucune application definie", null); //$NON-NLS-1$
         } else {
             IConfigurationElement[] elements=extensionPoint.getConfigurationElements();
 
@@ -104,7 +101,7 @@ public class JavaMappingExtensionManager {
                 try {
                     applications.add(new JavaMappingExtension(member));
                 } catch (CoreException e) {
-                    Activator.log(ERROR, "Failed loading extension", e); //$NON-NLS-1$
+                    Activator.logError("Failed loading extension", e); //$NON-NLS-1$
                 }
             }
         }

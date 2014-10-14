@@ -10,8 +10,9 @@ import org.eclipse.compare.ResourceNode;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.etools.Activator;
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -19,8 +20,7 @@ import org.eclipse.team.internal.ui.StorageTypedElement;
 import org.eclipse.team.ui.synchronize.ISynchronizeModelElement;
 import org.eclipse.team.ui.synchronize.SynchronizePageActionGroup;
 
-import org.eclipse.etools.Activator;
-
+@RemoveMe
 public class EI18NSynchronizeParticipantActionGroup extends SynchronizePageActionGroup {
 	@Override
 	public void fillContextMenu(IMenuManager menu) {
@@ -52,7 +52,7 @@ public class EI18NSynchronizeParticipantActionGroup extends SynchronizePageActio
 									is=((StorageTypedElement) right).getContents();
 									file.create(is, true, new NullProgressMonitor());
 								} catch (CoreException e) {
-									Activator.log(IStatus.ERROR, "Faield to overwrite " + file, e); //$NON-NLS-1$
+                                    Activator.logError("Faield to overwrite " + file, e); //$NON-NLS-1$
 								} finally {
 									IOUtils.closeQuietly(is);
 								}

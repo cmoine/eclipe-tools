@@ -7,7 +7,6 @@ import java.util.zip.ZipException;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.RemoveMe;
 import org.eclipse.etools.ei18n.handler.SynchronizeHandler;
@@ -64,9 +63,9 @@ public class SynchronizeAction extends CommonAction {
 				}
 				participant.refresh(resourcesArray, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getSite());
 			} catch (ZipException e) {
-				Activator.log(IStatus.ERROR, "Failed to synchronize", e); //$NON-NLS-1$
+                Activator.logError("Failed to synchronize", e); //$NON-NLS-1$
 			} catch (IOException e) {
-				Activator.log(IStatus.ERROR, "Failed to synchronize", e); //$NON-NLS-1$
+                Activator.logError("Failed to synchronize", e); //$NON-NLS-1$
 			}
 		}
 	}

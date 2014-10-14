@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
@@ -43,7 +42,7 @@ public class CodeAnalysis {
                 monitor.worked(1);
             }
         } catch (CoreException e) {
-            Activator.log(IStatus.ERROR, "Failed calculating method usage", e); //$NON-NLS-1$
+            Activator.logError("Failed calculating method usage", e); //$NON-NLS-1$
         }
     }
 

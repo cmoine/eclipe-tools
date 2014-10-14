@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.RemoveMe;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -70,7 +69,7 @@ public abstract class CompilationUnitAction extends CommonAction {
 						cus.addAll(compilationUnits);
 				}
 			} catch (JavaModelException e) {
-				Activator.log(IStatus.ERROR, "Failed to find children of " + current, e); //$NON-NLS-1$
+                Activator.logError("Failed to find children of " + current, e); //$NON-NLS-1$
 			}
             // TODO CME
             //		} else if (current != null && current instanceof ICompilationUnit && CompilationUnitUtil.isValid((ICompilationUnit) current)) {

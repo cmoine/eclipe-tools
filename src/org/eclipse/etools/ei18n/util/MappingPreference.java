@@ -7,7 +7,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.etools.Activator;
 import org.osgi.service.prefs.BackingStoreException;
@@ -52,7 +51,7 @@ public class MappingPreference {
                 }
             }
         } catch (BackingStoreException e) {
-            Activator.log(IStatus.ERROR, "Failed to read project preferences", e); //$NON-NLS-1$
+            Activator.logError("Failed to read project preferences", e); //$NON-NLS-1$
         }
         return Collections.unmodifiableList(result);
     }

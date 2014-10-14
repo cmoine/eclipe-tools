@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -70,17 +69,13 @@ public class EFavoritesQuickAssistProcessor implements IQuickAssistProcessor {
                 if (proposals.isEmpty() && //
                         (node.getParent() instanceof QualifiedName //
                         || node.getParent() instanceof MethodInvocation)) {
-                    //                    QualifiedName qName=(QualifiedName) node.getParent();
                     proposals.add(new StaticImportProposal(context));
                 }
-                //                node.getNodeType();
-
-                //                context.getCoveredNode().getParent()
             }
 
             return proposals.toArray(new IJavaCompletionProposal[proposals.size()]);
         } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "Failed to find EFavorites completion", e); //$NON-NLS-1$
+            Activator.logError("Failed to find EFavorites completion", e); //$NON-NLS-1$
         }
 
         return null;

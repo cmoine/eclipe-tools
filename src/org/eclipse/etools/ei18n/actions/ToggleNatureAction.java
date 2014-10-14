@@ -3,7 +3,6 @@ package org.eclipse.etools.ei18n.actions;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.RemoveMe;
 import org.eclipse.etools.ei18n.builder.I18NNature;
@@ -51,7 +50,7 @@ public class ToggleNatureAction extends CommonAction {
             }
             updateText();
         } catch (CoreException e) {
-            Activator.log(IStatus.ERROR, "Error while toggling project nature of " + getProject(), e); //$NON-NLS-1$
+            Activator.logError("Error while toggling project nature of " + getProject(), e); //$NON-NLS-1$
         }
 	}
 
@@ -76,7 +75,7 @@ public class ToggleNatureAction extends CommonAction {
                 }
             }
         } catch (CoreException e) {
-            Activator.log(IStatus.ERROR, "Failed to check nature", e); //$NON-NLS-1$
+            Activator.logError("Failed to check nature", e); //$NON-NLS-1$
         }
         return -1;
     }

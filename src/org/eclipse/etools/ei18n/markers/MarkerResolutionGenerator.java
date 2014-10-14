@@ -6,7 +6,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.etools.Activator;
@@ -40,7 +39,7 @@ public class MarkerResolutionGenerator implements IMarkerResolutionGenerator {
 				IFile file=iResource.getProject().getWorkspace().getRoot().getFile(new Path(requiredFile));
 				file.create(new NullInputStream(0), true, new NullProgressMonitor());
 			} catch (CoreException e) {
-				Activator.log(IStatus.ERROR, "Failed to create " + requiredFile, e); //$NON-NLS-1$
+                Activator.logError("Failed to create " + requiredFile, e); //$NON-NLS-1$
 			}
 		}
 	}

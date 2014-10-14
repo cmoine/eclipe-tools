@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.RemoveMe;
@@ -32,9 +31,9 @@ public class RegenerateAction extends CompilationUnitAction {
 						createField(type, (String) key);
 					}
 				} catch (JavaModelException e) {
-					Activator.log(IStatus.ERROR, "Failed creating field ", e); //$NON-NLS-1$
+                    Activator.logError("Failed creating field ", e); //$NON-NLS-1$
 				} catch (CoreException e) {
-					Activator.log(IStatus.ERROR, "Failed opening bundle file", e); //$NON-NLS-1$
+                    Activator.logError("Failed opening bundle file", e); //$NON-NLS-1$
 				}
 			}
 		}

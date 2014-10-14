@@ -1,7 +1,5 @@
 package org.eclipse.etools.ei18n.participants;
 
-import static org.eclipse.core.runtime.IStatus.ERROR;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -73,11 +71,11 @@ public class EI18NRenameParticipant extends RenameParticipant {
                 changes.add(change);
             }
         } catch (IOException e) {
-            Activator.log(ERROR, "Failed to read " + srcFile, e); //$NON-NLS-1$
+            Activator.logError("Failed to read " + srcFile, e); //$NON-NLS-1$
         } catch (CoreException e) {
-            Activator.log(ERROR, "Failed to read " + srcFile, e); //$NON-NLS-1$
+            Activator.logError("Failed to read " + srcFile, e); //$NON-NLS-1$
         } catch (BadLocationException e) {
-            Activator.log(ERROR, "Failed to read " + srcFile, e); //$NON-NLS-1$
+            Activator.logError("Failed to read " + srcFile, e); //$NON-NLS-1$
         }
         return changes;
     }

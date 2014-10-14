@@ -102,9 +102,8 @@ public class FindDeadCodeHandler extends AbstractHandler {
                     }
                 }
             } catch (CoreException e) {
-                Activator.log(IStatus.ERROR, "Failed visiting " + file, e); //$NON-NLS-1$
+                Activator.logError("Failed visiting " + file, e); //$NON-NLS-1$
             }
-            //            }
 		}
 
         if (cus.isEmpty()) {

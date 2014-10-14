@@ -74,7 +74,7 @@ public final class JavaFileSelectionDialog extends AbstractFileSelectionDialog {
         try {
             return (IFile) ((org.eclipse.jdt.internal.core.CompilationUnit) getFirstResult()).getCorrespondingResource();
         } catch (JavaModelException e) {
-            Activator.log(IStatus.ERROR, "", e);
+            Activator.logError("failed finding corresponding IResource", e); //$NON-NLS-1$
             return null;
         }
     }
@@ -105,7 +105,7 @@ public final class JavaFileSelectionDialog extends AbstractFileSelectionDialog {
                 getTreeViewer().setSelection(new StructuredSelection(newObj));
             }
         } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "", e);
+            Activator.logError("Failed creating button pressed", e); //$NON-NLS-1$
         }
     }
 
@@ -125,7 +125,7 @@ public final class JavaFileSelectionDialog extends AbstractFileSelectionDialog {
 
             return body.getBytes(getProject().getDefaultCharset());
         } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "", e);
+            Activator.logError("Failed getting contents", e); //$NON-NLS-1$
         }
         return ArrayUtils.EMPTY_BYTE_ARRAY;
     }

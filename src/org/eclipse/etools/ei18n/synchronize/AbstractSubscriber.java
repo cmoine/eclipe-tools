@@ -8,7 +8,6 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
 import org.eclipse.team.core.TeamException;
@@ -68,7 +67,7 @@ abstract class AbstractSubscriber extends ResourceVariantTreeSubscriber {
                                 result.add(new MyLocalResourceVariant(res));
 						}
 					} catch (CoreException e) {
-						Activator.log(IStatus.ERROR, "Failed to fecth member " + resource, e); //$NON-NLS-1$
+                        Activator.logError("Failed to fecth member " + resource, e); //$NON-NLS-1$
 					}
 				}
 				return result.toArray(new IResourceVariant[] {});

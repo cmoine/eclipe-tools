@@ -2,7 +2,6 @@ package org.eclipse.etools.ei18n.editors;
 
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.eclipse.core.runtime.IStatus.ERROR;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +22,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.etools.Activator;
@@ -157,9 +155,9 @@ public class EI18NEditorPart extends MultiPageEditorPart
                         //                            updateLink();
                         updateJavaFile();
                     } catch (CoreException e1) {
-                        Activator.log(IStatus.ERROR, "Failed to set association", e1); //$NON-NLS-1$
+                        Activator.logError("Failed to set association", e1); //$NON-NLS-1$
                     } catch (BackingStoreException e) {
-                        Activator.log(IStatus.ERROR, "Failed to store mapping pref", e); //$NON-NLS-1$
+                        Activator.logError("Failed to store mapping pref", e); //$NON-NLS-1$
                     }
 
                 }
@@ -186,7 +184,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
                     //                    refreshColumns(locale);
                 } catch (CoreException e) {
-                    Activator.log(ERROR, "Failed creating file " + newFile, e); //$NON-NLS-1$
+                    Activator.logError("Failed creating file " + newFile, e); //$NON-NLS-1$
                 }
             }
         };
@@ -218,7 +216,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
             }
             ei18nComposite.setLocales(infos.keySet());
         } catch (CoreException e1) {
-            Activator.log(IStatus.ERROR, "Failed loading locales", e1); //$NON-NLS-1$
+            Activator.logError("Failed loading locales", e1); //$NON-NLS-1$
         }
 
         class ViewLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider, ITableFontProvider {
@@ -388,7 +386,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
                     ei18nComposite.getViewer().update(line, new String[] { property });
                     firePropertyChange(PROP_DIRTY);
                 } catch (Exception e) {
-                    Activator.log(ERROR, "Failed to modify source code", e); //$NON-NLS-1$
+                    Activator.logError("Failed to modify source code", e); //$NON-NLS-1$
                 }
             }
 
@@ -551,9 +549,9 @@ public class EI18NEditorPart extends MultiPageEditorPart
                 setPageText(1, javaFile.getName());
                 setPageImage(1, javaEditor.getTitleImage());
             } catch (PartInitException e) {
-                Activator.log(ERROR, "Failed to create page for " + javaFile, e); //$NON-NLS-1$
+                Activator.logError("Failed to create page for " + javaFile, e); //$NON-NLS-1$
             } catch (Exception e) {
-                Activator.log(ERROR, "Error loadingg properties for " + javaFile, e); //$NON-NLS-1$
+                Activator.logError("Error loadingg properties for " + javaFile, e); //$NON-NLS-1$
             }
         }
 
@@ -605,9 +603,9 @@ public class EI18NEditorPart extends MultiPageEditorPart
             IDocument doc=editor.getDocumentProvider().getDocument(editor.getEditorInput());
             infos.put(locale, new Information(f, lineProps, editor, doc));
         } catch (PartInitException e) {
-            Activator.log(ERROR, "Failed to create page for " + f, e); //$NON-NLS-1$
+            Activator.logError("Failed to create page for " + f, e); //$NON-NLS-1$
         } catch (Exception e) {
-            Activator.log(ERROR, "Error loadingg properties for " + f, e); //$NON-NLS-1$
+            Activator.logError("Error loadingg properties for " + f, e); //$NON-NLS-1$
         }
     }
 
@@ -831,7 +829,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
                     //                    LineProperties lineProperties=docs.inverse().get(document);
                     property.reload(document.get());
                 } catch (Exception e1) {
-                    Activator.log(ERROR, "Failed to delete source code in " + property.getFile(), e1); //$NON-NLS-1$
+                    Activator.logError("Failed to delete source code in " + property.getFile(), e1); //$NON-NLS-1$
                 }
             }
         }

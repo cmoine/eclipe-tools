@@ -1,8 +1,5 @@
 package org.eclipse.etools.ei18n.extensions;
 
-import static org.eclipse.core.runtime.IStatus.ERROR;
-import static org.eclipse.core.runtime.IStatus.INFO;
-
 import java.util.Collections;
 import java.util.List;
 
@@ -70,7 +67,7 @@ public class TranslatorExtensionManager {
         IExtensionPoint extensionPoint=registry.getExtensionPoint(EXTENSION_ID);
 
         if (extensionPoint == null) {
-            Activator.log(INFO, "Aucune application definie", null); //$NON-NLS-1$
+            Activator.logInfo("Aucune application definie", null); //$NON-NLS-1$
         } else {
             IConfigurationElement[] elements=extensionPoint.getConfigurationElements();
 
@@ -83,7 +80,7 @@ public class TranslatorExtensionManager {
 
                     applications.add(new TranslatorExtension(id, name, desc, impexApplication));
                 } catch (CoreException e) {
-                    Activator.log(ERROR, "Failed loading extension", e); //$NON-NLS-1$
+                    Activator.logError("Failed loading extension", e); //$NON-NLS-1$
                 }
             }
         }

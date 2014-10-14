@@ -11,7 +11,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.synchronize.EI18NSynchronizeParticipant;
 import org.eclipse.etools.ei18n.util.EI18NFile;
@@ -57,9 +56,9 @@ public class SynchronizeHandler extends AbstractHandler implements IHandler {
                 }
                 participant.refresh(resourcesArray, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getSite());
             } catch (ZipException e) {
-                Activator.log(IStatus.ERROR, "Failed to synchronize", e); //$NON-NLS-1$
+                Activator.logError("Failed to synchronize", e); //$NON-NLS-1$
             } catch (IOException e) {
-                Activator.log(IStatus.ERROR, "Failed to synchronize", e); //$NON-NLS-1$
+                Activator.logError("Failed to synchronize", e); //$NON-NLS-1$
             }
         }
         return null;

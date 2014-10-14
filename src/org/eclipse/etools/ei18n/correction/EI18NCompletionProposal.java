@@ -111,7 +111,7 @@ public class EI18NCompletionProposal extends LinkedCorrectionProposal /* impleme
             file=(IFile) context.getCompilationUnit().getCorrespondingResource();
             project=file.getProject();
         } catch (JavaModelException e) {
-            Activator.log(IStatus.ERROR, "Failed to get project", e); //$NON-NLS-1$
+            Activator.logError("Failed to get project", e); //$NON-NLS-1$
         }
     }
 
@@ -357,7 +357,7 @@ public class EI18NCompletionProposal extends LinkedCorrectionProposal /* impleme
                 //                }
             }
         } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "", e);
+            Activator.logError("Failed applying to document", e); //$NON-NLS-1$
         }
     }
 

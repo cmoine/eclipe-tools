@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.services.BingTranslatorService;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -83,7 +82,7 @@ public abstract class TranslationCellEditor extends TextAndDialogCellEditor {
                 }
             }
         } catch (Exception e) {
-            Activator.log(IStatus.ERROR, "Failed to find translation(s) for " + StringUtils.join(toTranslate, ", "), e); //$NON-NLS-1$ //$NON-NLS-2$
+            Activator.logError("Failed to find translation(s) for " + StringUtils.join(toTranslate, ", "), e); //$NON-NLS-1$ //$NON-NLS-2$
         }
         return StringUtils.EMPTY;
     }

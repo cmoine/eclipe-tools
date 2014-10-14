@@ -8,7 +8,8 @@ import java.util.zip.ZipException;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.etools.Activator;
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.team.core.subscribers.Subscriber;
 import org.eclipse.team.ui.TeamUI;
@@ -20,8 +21,7 @@ import org.eclipse.team.ui.synchronize.SynchronizePageActionGroup;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 
-import org.eclipse.etools.Activator;
-
+@RemoveMe
 public class EI18NSynchronizeParticipant extends SubscriberParticipant /* ScopableSubscriberParticipant implements ISynchronizeParticipant */{
 	public static final String ID=EI18NSynchronizeParticipant.class.getName();
 
@@ -44,7 +44,7 @@ public class EI18NSynchronizeParticipant extends SubscriberParticipant /* Scopab
 			setInitializationData(TeamUI.getSynchronizeManager().getParticipantDescriptor(ID));
 			setSecondaryId(Long.toString(System.currentTimeMillis()));
 		} catch (CoreException e) {
-            Activator.log(IStatus.ERROR, "Failed to synchronize", e); //$NON-NLS-1$
+            Activator.logError("Failed to synchronize", e); //$NON-NLS-1$
 		}
 	}
 

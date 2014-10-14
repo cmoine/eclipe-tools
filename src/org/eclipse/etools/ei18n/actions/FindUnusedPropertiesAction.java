@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.RemoveMe;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -103,7 +102,7 @@ public class FindUnusedPropertiesAction extends CompilationUnitAction {
 									res.delete(true, null);
 									res.create(new ByteArrayInputStream(StringUtils.join(lines.toArray(), IOUtils.LINE_SEPARATOR).getBytes()), true, null);
 								} catch (IOException e) {
-									Activator.log(IStatus.ERROR, "Failed patching " + res, e); //$NON-NLS-1$
+                                    Activator.logError("Failed patching " + res, e); //$NON-NLS-1$
 								} finally {
 									IOUtils.closeQuietly(is);
 								}
@@ -111,7 +110,7 @@ public class FindUnusedPropertiesAction extends CompilationUnitAction {
 						}
 					}
 				} catch (CoreException e) {
-					Activator.log(IStatus.ERROR, "Failed to patch " + cu.getResource(), e); //$NON-NLS-1$
+                    Activator.logError("Failed to patch " + cu.getResource(), e); //$NON-NLS-1$
 				}
 			}
 			return;

@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.EI18NStartup;
 import org.eclipse.jdt.core.Flags;
@@ -63,7 +62,7 @@ public abstract class DefaultJavaMapping implements IJavaMapping {
                     }
                 }
             } catch (JavaModelException e1) {
-                Activator.log(IStatus.ERROR, "Failed to load CompilationUnit", e1); //$NON-NLS-1$
+                Activator.logError("Failed to load CompilationUnit", e1); //$NON-NLS-1$
             }
         }
         return result;
@@ -112,7 +111,7 @@ public abstract class DefaultJavaMapping implements IJavaMapping {
             try {
                 rewrite.rewriteAST(document, cu.getJavaElement().getJavaProject().getOptions(true)).apply(document);
             } catch (BadLocationException e) {
-                Activator.log(IStatus.ERROR, "Failed rewriting AST", e); //$NON-NLS-1$
+                Activator.logError("Failed rewriting AST", e); //$NON-NLS-1$
                 throw new RuntimeException(e);
             }
             //            rewriteAst(cu, rewrite, fieldName);
@@ -176,7 +175,7 @@ public abstract class DefaultJavaMapping implements IJavaMapping {
                     });
                     return decls[0];
                 } catch (Exception e) {
-                    Activator.log(IStatus.ERROR, "", e);
+                    Activator.logError("Failed creating field declaration", e); //$NON-NLS-1$
                 }
 
                 return null;

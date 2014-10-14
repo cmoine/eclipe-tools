@@ -14,14 +14,12 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.etools.Activator;
 import org.eclipse.team.core.variants.ResourceVariantTree;
 import org.eclipse.team.core.variants.SessionResourceVariantByteStore;
 
-import org.eclipse.etools.Activator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import static org.eclipse.core.runtime.IStatus.ERROR;
 
 public class XLSSubscriber extends AbstractSubscriber {
     private List<Row> rows;
@@ -44,7 +42,7 @@ public class XLSSubscriber extends AbstractSubscriber {
             HSSFRow firstRow=sheet.getRow(0);
             for (int col=0; col < firstRow.getPhysicalNumberOfCells(); col++) {
             	if(firstRow.getCell(col) == null){
-            		Activator.log(ERROR, "Impossible de trouver la colonne => "+col, null); //$NON-NLS-1$
+                    Activator.logError("Impossible de trouver la colonne => " + col, null); //$NON-NLS-1$
             		continue;
             	}
                 String cellValue=firstRow.getCell(col).getStringCellValue();

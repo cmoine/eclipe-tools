@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.RemoveMe;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -106,11 +105,11 @@ public class MigrateNLSAction extends CompilationUnitAction {
 						// update of the compilation unit
 						cu.getBuffer().setContents(newSource);
 					} catch (CoreException e) {
-						Activator.log(IStatus.ERROR, "Failed to patch " + cu.getResource(), e); //$NON-NLS-1$
+                        Activator.logError("Failed to patch " + cu.getResource(), e); //$NON-NLS-1$
 					} catch (MalformedTreeException e) {
-						Activator.log(IStatus.ERROR, "Failed to parse " + cu.getResource(), e); //$NON-NLS-1$
+                        Activator.logError("Failed to parse " + cu.getResource(), e); //$NON-NLS-1$
 					} catch (BadLocationException e) {
-						Activator.log(IStatus.ERROR, "Failed to modify " + cu.getResource(), e); //$NON-NLS-1$
+                        Activator.logError("Failed to modify " + cu.getResource(), e); //$NON-NLS-1$
 					}
 				}
 				return;

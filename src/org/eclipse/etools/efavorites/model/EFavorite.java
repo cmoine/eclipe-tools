@@ -1,7 +1,5 @@
 package org.eclipse.etools.efavorites.model;
 
-import static org.eclipse.core.runtime.IStatus.ERROR;
-
 import java.io.ByteArrayInputStream;
 
 import org.apache.commons.codec.binary.Base64InputStream;
@@ -29,12 +27,11 @@ public class EFavorite {
             try {
                 image=new Image(Display.getCurrent(), new ImageLoader().load(new Base64InputStream(new ByteArrayInputStream(data)))[0]);
             } catch (Throwable t) {
-                Activator.log(ERROR, "Failed to load image " + data.length + ":" + StringUtils.join(data), t); //$NON-NLS-1$ //$NON-NLS-2$
+                Activator.logError("Failed to load image " + data.length + ":" + StringUtils.join(data), t); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
 
         file=(IFile) ResourcesPlugin.getWorkspace().getRoot().findMember(str);
-        // image=imageData == null ? null : new Image(Display.getCurrent(), imageData);
 	}
 
     public IFile getFile() {
@@ -58,7 +55,7 @@ public class EFavorite {
         try {
             IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), file);
         } catch (PartInitException e) {
-            Activator.log(ERROR, "Failed to open editor", e); //$NON-NLS-1$
+            Activator.logError("Failed to open editor", e); //$NON-NLS-1$
         }
     }
 }

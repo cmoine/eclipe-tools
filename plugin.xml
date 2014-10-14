@@ -460,6 +460,18 @@ public class Messages extends NLS {
       </page>
    </extension>
    <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="org.eclipse.etools.eshell.EShellCommand"
+            commandId="org.eclipse.etools.eshell.shellOpen">
+         <enabledWhen>
+            <reference
+                  definitionId="org.eclipse.ui.ide.showInDefinition">
+            </reference>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
          point="org.eclipse.ui.commands">
       <category
             id="org.eclipse.etools.category1"
@@ -467,16 +479,15 @@ public class Messages extends NLS {
       </category>
       <command
             categoryId="org.eclipse.etools.category1"
-            defaultHandler="org.eclipse.etools.eshell.EShellCommand"
             id="org.eclipse.etools.eshell.shellOpen"
-            name="Etool Open">
+            name="Etool Command Line">
       </command>
-      <command
+      <!-- <command
             categoryId="org.eclipse.etools.category1"
             defaultHandler="org.eclipse.etools.eshell.EShellCommand"
             id="org.eclipse.etools.eshell.shellExplore"
             name="Etool Explore">
-      </command>
+      </command> -->
       <command
             categoryId="org.eclipse.etools.category1"
             defaultHandler="org.eclipse.etools.xsdgen.XsdGenHandler"
@@ -509,42 +520,6 @@ public class Messages extends NLS {
          <menu
                id="org.eclipse.plugins.etools.eshell.menu"
                label="Etool">
-            <command
-                  commandId="org.eclipse.etools.eshell.shellExplore"
-                  icon="icons/eshell/fldr_obj.gif"
-                  label="Explore..."
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <test
-                           forcePluginActivation="true"
-                           property="org.eclipse.etools.eshell.EShellPropertyTester.hasResourceSelection">
-                     </test>
-                  </with>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="org.eclipse.etools.eshell.shellOpen"
-                  icon="icons/eshell/easyshell.gif"
-                  label="Command Line..."
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <with
-                        variable="activePart">
-                     <test
-                           forcePluginActivation="true"
-                           property="org.eclipse.etools.eshell.EShellPropertyTester.hasResourceSelection">
-                     </test>
-                  </with>
-               </visibleWhen>
-            </command>
-            <separator
-                  name="eclipe-tools.separator1"
-                  visible="true">
-            </separator>
             <command
                   commandId="net.cmoine.xsdgen.command1"
                   icon="icons/xsdgen/xml.png"
@@ -584,8 +559,23 @@ public class Messages extends NLS {
             </command>
          </menu>
       </menuContribution>
+         <menuContribution
+            locationURI="popup:org.eclipse.ui.menus.showInMenu">
+ 	     <command
+             commandId="org.eclipse.etools.eshell.shellOpen"
+             icon="icons/eshell/easyshell.gif"
+             label="Command Line..."
+             style="push">
+          <visibleWhen
+                checkEnabled="false">
+             <reference
+                   definitionId="org.eclipse.ui.ide.showInDefinition">
+             </reference>
+          </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
-   <extension
+   <!-- <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="org.eclipse.etools.eshell.EShellPropertyTester"
@@ -594,7 +584,7 @@ public class Messages extends NLS {
             properties="hasResourceSelection"
             type="org.eclipse.ui.IWorkbenchPart">
       </propertyTester>
-   </extension>
+   </extension> -->
    <extension
          point="org.eclipse.search.searchResultViewPages">
       <viewPage

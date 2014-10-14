@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.actions.ToggleNatureAction;
@@ -43,7 +42,7 @@ public class EI18nPropertyPage extends PropertyPage {
         try {
             return JavaMappingExtensionManager.getInstance().find(project.getPersistentProperty(QNAME));//mappingPreference.getExtension();
         } catch (CoreException e1) {
-            Activator.log(IStatus.WARNING, "Failed to get property", e1); //$NON-NLS-1$
+            Activator.logWarning("Failed to get property", e1); //$NON-NLS-1$
         }
         List<JavaMappingExtension> all=JavaMappingExtensionManager.getInstance().getAll();
         if (!all.isEmpty())
@@ -119,7 +118,7 @@ public class EI18nPropertyPage extends PropertyPage {
         try {
             getProject().setPersistentProperty(QNAME, null);
         } catch (CoreException e) {
-            Activator.log(IStatus.WARNING, "Failed to restore to default", e); //$NON-NLS-1$
+            Activator.logWarning("Failed to restore to default", e); //$NON-NLS-1$
         }
     }
 
