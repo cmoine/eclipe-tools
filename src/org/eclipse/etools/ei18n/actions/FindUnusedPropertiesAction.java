@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
@@ -35,6 +36,7 @@ import org.eclipse.ui.dialogs.ListDialog;
 
 import com.google.common.collect.Lists;
 
+@RemoveMe
 public class FindUnusedPropertiesAction extends CompilationUnitAction {
 	public FindUnusedPropertiesAction() {
 		super("Find unused properties"); //$NON-NLS-1$

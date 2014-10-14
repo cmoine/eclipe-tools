@@ -16,12 +16,9 @@ import org.eclipse.swt.graphics.Point;
 import com.google.common.base.Joiner;
 
 public class EFavoritesProposal implements IJavaCompletionProposal {
-    //    private final IInvocationContext context;
     private final String fullName;
 
     public EFavoritesProposal(String fullName) {
-        //        this.context=context;
-        //        super(null, null, null, 0);
         this.fullName=fullName;
     }
 
@@ -56,7 +53,6 @@ public class EFavoritesProposal implements IJavaCompletionProposal {
     }
 
     public int getRelevance() {
-        // TODO Auto-generated method stub
         return 0;
     }
 }

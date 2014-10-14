@@ -1,15 +1,13 @@
 package org.eclipse.etools.ei18n.participants;
 
-import static org.eclipse.core.runtime.IStatus.ERROR;
-
-import org.eclipse.etools.Activator;
-import org.eclipse.etools.ei18n.util.EI18NConstants;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.etools.ei18n.util.EI18NUtil;
+import org.eclipse.etools.ei18n.util.MappingPreference;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 
 final class EI18NParticipant {
-    static final String NAME="EI18N"; //$NON-NLS-1$
+    protected static final String NAME="EI18N"; //$NON-NLS-1$
 
     IField field;
     private final boolean initialized;
@@ -20,14 +18,13 @@ final class EI18NParticipant {
 
     private boolean initialize(Object element) {
         if (element instanceof IField) {
-            try {
-                field=(IField) element;
-                return EI18NConstants.NLS_CLASS_NAME.equals(getDeclaringType().getSuperclassName());
-            } catch (JavaModelException e) {
-                Activator.log(ERROR, "Failed to determin if the field was concerned", e); //$NON-NLS-1$
+            field=(IField) element;
+            IFile res=EI18NUtil.getFile(field);
+            for (MappingPreference mapping : MappingPreference.list(res.getProject())) {
+                if (mapping.getJavaFile().equals(res))
+                    return true;
             }
         }
-
         return false;
     }
 

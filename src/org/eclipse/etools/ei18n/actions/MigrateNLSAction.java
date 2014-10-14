@@ -6,6 +6,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -27,6 +28,7 @@ import org.eclipse.text.edits.TextEdit;
 
 import com.google.common.collect.Lists;
 
+@RemoveMe
 public class MigrateNLSAction extends CompilationUnitAction {
 	public MigrateNLSAction() {
 		super("Old -> New NLS system"); //$NON-NLS-1$

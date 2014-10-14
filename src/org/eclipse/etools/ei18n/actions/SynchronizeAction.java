@@ -9,6 +9,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
+import org.eclipse.etools.RemoveMe;
+import org.eclipse.etools.ei18n.handler.SynchronizeHandler;
 import org.eclipse.etools.ei18n.synchronize.EI18NSynchronizeParticipant;
 import org.eclipse.etools.ei18n.util.EI18NFile;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -21,6 +23,12 @@ import org.eclipse.ui.PlatformUI;
 
 import com.google.common.collect.Lists;
 
+/**
+ * @author cmoine
+ * @deprecated {@link SynchronizeHandler} 
+ */
+@Deprecated
+@RemoveMe
 public class SynchronizeAction extends CommonAction {
 	public SynchronizeAction() {
         setText("Synchronize Ei18n"); //$NON-NLS-1$

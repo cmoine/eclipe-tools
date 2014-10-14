@@ -1,19 +1,16 @@
 package org.eclipse.etools.ei18n.actions;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
-import org.eclipse.etools.ei18n.util.EI18NConstants;
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -34,7 +31,8 @@ import org.eclipse.ui.PlatformUI;
 
 import com.google.common.collect.Lists;
 
-public class CompilationUnitAction extends CommonAction {
+@RemoveMe
+public abstract class CompilationUnitAction extends CommonAction {
 	protected CompilationUnitAction(String text) {
         setText(text);
 	}
@@ -83,23 +81,23 @@ public class CompilationUnitAction extends CommonAction {
 	}
 
     protected Properties getBundle(IResource res, IType type) throws JavaModelException, CoreException {
-		InputStream is=null;
-		try {
-            if (EI18NConstants.NLS_CLASS_NAME.equals(type.getSuperclassName())) { 
-				IFile file=lookupBundle(res, type);
-				if (file != null) {
-					Properties props=new Properties();
-					is=file.getContents();
-					props.load(is);
-					return props;
-				}
-			}
-
-		} catch (IOException e) {
-			Activator.log(IStatus.ERROR, "Failed reading bundle file", e); //$NON-NLS-1$
-		} finally {
-			IOUtils.closeQuietly(is);
-		}
+        // TODO
+        //		InputStream is=null;
+        //		try {
+        //            if (EI18NConstants.NLS_CLASS_NAME.equals(type.getSuperclassName())) { 
+        //				IFile file=lookupBundle(res, type);
+        //				if (file != null) {
+        //					Properties props=new Properties();
+        //					is=file.getContents();
+        //					props.load(is);
+        //					return props;
+        //				}
+        //			}
+        //		} catch (IOException e) {
+        //			Activator.log(IStatus.ERROR, "Failed reading bundle file", e); //$NON-NLS-1$
+        //		} finally {
+        //			IOUtils.closeQuietly(is);
+        //		}
 		return null;
 	}
 

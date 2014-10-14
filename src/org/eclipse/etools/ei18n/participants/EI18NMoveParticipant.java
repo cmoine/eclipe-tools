@@ -53,8 +53,9 @@ public class EI18NMoveParticipant extends MoveParticipant {
         List<Change> changes=Lists.newArrayList();
         IFolder dstDir=(IFolder) ((IType) getArguments().getDestination()).getResource().getParent();
         for (IResource res : ((IFolder) participant.getDeclaringType().getResource().getParent()).members()) {
-            if (res instanceof IFile
-                    && (EI18NConstants.LOCALE_PATTERN.matcher(res.getName()).matches() || EI18NConstants.PATTERN.matcher(res.getName()).matches())) {
+            if (res instanceof IFile //
+                    && (EI18NConstants.LOCALE_PATTERN.matcher(res.getName()).matches() //
+                    || EI18NConstants.PATTERN.matcher(res.getName()).matches())) {
                 IFile srcFile=(IFile) res;
                 IFile dstFile=dstDir.getFile(srcFile.getName());
                 changes.addAll(createChange(srcFile, dstFile));
@@ -65,28 +66,10 @@ public class EI18NMoveParticipant extends MoveParticipant {
 
     private List<Change> createChange(IFile srcFile, IFile dstFile) {
         List<Change> changes=Lists.newArrayList();
-        // Remove from old file
-        // InputStream is=null;
         try {
             String key=participant.getField().getElementName();
-            // int offset=0;
-            // String removedLine=null;
-            // Properties props=new Properties();
-            // DefaultLineTracker lineTracker=new DefaultLineTracker();
-            // String content=IOUtils.toString(is=srcFile.getContents());
-            // lineTracker.set(content);
             LineProperties properties=new LineProperties(srcFile);
-            // for (int lineNumber=0; lineNumber < lineTracker.getNumberOfLines(); lineNumber++) {
             if (properties.contains(key)) {
-                // for(String k: properties) {
-                // IRegion region=lineTracker.getLineInformation(lineNumber);
-                // int start=region.getOffset();
-                // int end=start + region.getLength();
-                // String line=content.substring(start, end);
-                //
-                // props.load(new ByteArrayInputStream(line.getBytes()));
-                // if (props.containsKey(key)) {
-                // removedLine=line;
                 IRegion region=properties.getRegion(key);
                 {
                     TextFileChange change=new TextFileChange("Remove key " + key, srcFile); //$NON-NLS-1$
@@ -99,19 +82,13 @@ public class EI18NMoveParticipant extends MoveParticipant {
                     change.setEdit(new InsertEdit(0, line.replaceAll("\\r|\\n", StringUtils.EMPTY) + IOUtils.LINE_SEPARATOR)); //$NON-NLS-1$
                     changes.add(change);
                 }
-                // break;
-                // }
             }
-            // if (removedLine != null) {
-            // }
         } catch (IOException e) {
             Activator.log(ERROR, "Failed to read " + srcFile, e); //$NON-NLS-1$
         } catch (CoreException e) {
             Activator.log(ERROR, "Failed to read " + srcFile, e); //$NON-NLS-1$
         } catch (BadLocationException e) {
             Activator.log(ERROR, "Failed to read " + srcFile, e); //$NON-NLS-1$
-            // } finally {
-            // IOUtils.closeQuietly(is);
         }
         return changes;
     }

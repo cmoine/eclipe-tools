@@ -12,6 +12,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public enum EFavoritesImage {
     TRASH_16("/icons/efavorites/trash.png"), //$NON-NLS-1$
+    STATIC_IMPORT_16("/icons/efavorites/static_import.gif"), //$NON-NLS-1$
     ENABLED_STAR_16("/icons/efavorites/enabled-star.gif"), //$NON-NLS-1$
     DISABLED_STAR_16("/icons/efavorites/disabled-star.gif"), //$NON-NLS-1$
     PREFERENCES_16("/icons/efavorites/preferences.gif"); //$NON-NLS-1$

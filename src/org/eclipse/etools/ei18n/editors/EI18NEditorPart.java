@@ -89,18 +89,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMarker
+public class EI18NEditorPart extends MultiPageEditorPart
 {
     public static final String ID=EI18NEditorPart.class.getName();
 
     private static final String EI18N="EI18N"; //$NON-NLS-1$
-    //    private IFile file;
-    //    private final List<IFile> localFiles=Lists.newArrayList();
-    //    private final List<String> locales=Lists.newArrayList();
     private EI18NComposite ei18nComposite;
-    //    private final BiMap<LineProperties, IDocument> docs=HashBiMap.create();
-    //    private Map<String, LineProperties> props;
-    //    private List<TextEditor> editors;
     private int oldPageIndex=-1;
 
     private static class Information {
@@ -112,48 +106,17 @@ public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMark
         }
 
         private final LineProperties properties;
-        //        private final IFile file;
         private final IDocument doc;
         private final TextEditor editor;
     }
 
     private final Map<String, Information> infos=Maps.newHashMap();
     private final Set<String> newKeys=Sets.newHashSet();
-    //    private final List<Image> images=new ArrayList<Image>();
-    //    private IContainer folder;
-    //    private ICompilationUnit cu;
-    //    private static final Function<String, StringBuffer> STR2BUF=new Function<String, StringBuffer>() {
-    //        
-    //        public StringBuffer apply(String str) {
-    //            return new StringBuffer(str);
-    //        }
-    //
-    //        
-    //        public boolean equals(Object obj) {
-    //            return false;
-    //        }
-    //    };
-
-    //    private static final Function<StringBuffer, String> BUF2STR=new Function<StringBuffer, String>() {
-    //        
-    //        public String apply(StringBuffer str) {
-    //            return str.toString();
-    //        }
-    //
-    //        
-    //        public boolean equals(Object obj) {
-    //            return false;
-    //        }
-    //    };
     private CompilationUnitEditor javaEditor;
     private IFile javaFile;
     private Link link;
     private IFile propertyFile;
     private MappingPreference mappingPreference;
-
-    //    private ComboViewer comboViewer;
-
-    //    private SplitButton splitButton;
 
     @Override
     protected void createPages() {
@@ -203,35 +166,6 @@ public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMark
             }
         });
         link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-        //        splitButton=createSplitButton(composite);
-        //        comboViewer=new ComboViewer(composite);
-        //        comboViewer.setLabelProvider(new LabelProvider() {
-        //            
-        //            public String getText(Object element) {
-        //                JavaMappingExtension ext=(JavaMappingExtension) element;
-        //                return ext.getName();
-        //            }
-        //        });
-        //        comboViewer.setContentProvider(ArrayContentProvider.getInstance());
-        //        comboViewer.setInput(JavaMappingExtensionManager.getInstance().getAll());
-        //        JavaMappingExtension extension=mappingPreference.getExtension();
-        //        if (extension != null) {
-        //            comboViewer.setSelection(new StructuredSelection(extension));
-        //        } else if (!JavaMappingExtensionManager.getInstance().getAll().isEmpty()) {
-        //            comboViewer.setSelection(new StructuredSelection(JavaMappingExtensionManager.getInstance().getAll().get(0)));
-        //        }
-        //        comboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-        //            
-        //            public void selectionChanged(SelectionChangedEvent event) {
-        //                try {
-        //                    mappingPreference.set(getSelectedExtension());
-        //                    updateJavaContent();
-        //                } catch (BackingStoreException e) {
-        //                    Activator.log(IStatus.ERROR, "Failed to store mapping pref", e); //$NON-NLS-1$
-        //                }
-        //            }
-        //        });
 
         ei18nComposite=new EI18NComposite(composite) {
 
@@ -287,23 +221,6 @@ public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMark
             Activator.log(IStatus.ERROR, "Failed loading locales", e1); //$NON-NLS-1$
         }
 
-        //        for (IFile f : new ImmutableList.Builder<IFile>().add(file).addAll(localFiles).build()) {
-        //            loadPropertyTab(f);
-        //        }
-
-        //        if (cu != null) {
-        //            try {
-        //                for (IType type : cu.getAllTypes()) {
-        //                    for (IField field : type.getFields()) {
-        //                        if (CompilationUnitUtil.isValid(field)) {
-        //                            keys.add(field.getElementName());
-        //                        }
-        //                    }
-        //                }
-        //            } catch (JavaModelException e1) {
-        //                Activator.log(IStatus.ERROR, "Failed to load CompilationUnit", e1); //$NON-NLS-1$
-        //            }
-        //        }
         class ViewLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider, ITableFontProvider {
             private Font boldFont;
             private Font italicFont;
@@ -595,55 +512,8 @@ public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMark
         updateJavaContent();
     }
 
-    //    private void createSplitButton(Composite composite) {
-    //        splitButton=new SplitButton(composite, SWT.NONE);
-    //        Menu menu=new Menu(splitButton);
-    //        for (JavaMappingExtension extension : JavaMappingExtensionManager.getInstance().getAll()) {
-    //            MenuItem item=new MenuItem(menu, SWT.RADIO);
-    //            item.setText(extension.getName());
-    //            item.setData(extension);
-    //            item.addListener(SWT.Selection, new Listener() {
-    //                
-    //                public void handleEvent(Event event) {
-    //                    splitButton.setData(event.widget.getData());
-    //                    updateSplitButton();
-    //                }
-    //            });
-    //        }
-    //        splitButton.setMenu(menu);
-    //        splitButton.addSplitButtonSelectionListener(new SplitButtonSelectionListener() {
-    //            
-    //            public boolean showMenu() {
-    //                return true;
-    //            }
-    //
-    //            
-    //            public void buttonSelected() {
-    //                // TODO Auto-generated method stub
-    //            }
-    //        });
-    //        splitButton.setData(mappingPreference.getExtension());
-    //        updateSplitButton();
-    //        //        return splitButton;
-    //    }
-    //
-    //    private void updateSplitButton() {
-    //        JavaMappingExtension selection=(JavaMappingExtension) splitButton.getData();
-    //        splitButton.setText(selection.getName());
-    //        for (MenuItem item : splitButton.getMenu().getItems()) {
-    //            item.setSelection(item.getData() == selection);
-    //        }
-    //    }
-
     private void updateJavaFile() {
-        //        javaFile=null;
-        javaFile=mappingPreference.getJavaFile();//prefs.get(propertyFile.toString(), null);//getProject().getPersistentProperty(qualifiedName);
-        //        if (value != null) {
-        //            IFile file=(IFile) getProject().findMember(value);
-        //            if (file != null) {
-        //                javaFile=file;
-        //            }
-        //        }
+        javaFile=mappingPreference.getJavaFile();
 
         // Clear previous Java Editor
         main: while (true) {
@@ -710,12 +580,6 @@ public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMark
             }
 
             javaMapping.syncFields(fieldsToAdd, fieldsToRemove);
-            //            for (String str : notFound) {
-            //                javaMapping.addField(str);
-            //            }
-            //            for (String str : keys) {
-            //                javaMapping.removeField(str);
-            //            }
         }
     }
 
@@ -800,14 +664,6 @@ public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMark
 
         setKeySelected(selectedKey);
     }
-
-    //    protected LineProperties getLineProperties() {
-    //        return props.get(oldPageIndex - (!hasAssociation() ? 1 : 2));
-    //    }
-    //
-    //    private boolean hasAssociation() {
-    //        return javaEditor != null;
-    //    }
 
     private void setKeySelected(String selectedKey) {
         if (oldPageIndex == 0) {
@@ -948,22 +804,6 @@ public class EI18NEditorPart extends MultiPageEditorPart // implements IGotoMark
         }
         return false;
     }
-
-    //    public void gotoMarker(IMarker marker) {
-    //        int start=MarkerUtilities.getCharStart(marker);
-    //        int end=MarkerUtilities.getCharEnd(marker);
-    //        try {
-    //            TextEditor textEditor=infos.get(EMPTY).editor;
-    //            String keyName=textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput()).get(start, end - start);
-    //            select(keyName);
-    //        } catch (BadLocationException e) {
-    //            Activator.log(IStatus.ERROR, "Failed to GOTO", e); //$NON-NLS-1$
-    //        }
-    //        // EditorUtility.revealInEditor(javaEditor, start, end - start);
-    //        // for (TextEditor textEditor : editors) {
-    //        // EditorUtility.revealInEditor(textEditor, start, end - start);
-    //        // }
-    //    }
 
     public void select(String key) {
         if (StringUtils.isNotEmpty(key)) {

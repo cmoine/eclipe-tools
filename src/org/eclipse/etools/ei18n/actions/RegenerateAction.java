@@ -6,14 +6,15 @@ import java.util.Properties;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.etools.Activator;
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.MessageDialog;
 
-import org.eclipse.etools.Activator;
-
+@RemoveMe
 public class RegenerateAction extends CompilationUnitAction {
 	public RegenerateAction() {
 		super("Regenerate"); //$NON-NLS-1$

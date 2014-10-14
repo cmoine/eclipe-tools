@@ -5,8 +5,10 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.etools.Activator;
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.etools.ei18n.builder.I18NNature;
 
+@RemoveMe
 public class ToggleNatureAction extends CommonAction {
 	public ToggleNatureAction() {
         updateText();

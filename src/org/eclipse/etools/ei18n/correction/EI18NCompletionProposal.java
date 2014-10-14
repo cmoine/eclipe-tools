@@ -73,7 +73,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import com.google.common.collect.Sets;
 
 public class EI18NCompletionProposal extends LinkedCorrectionProposal /* implements IJavaCompletionProposal*/{
-    private static final String ADD_STRING_ID=Activator.PLUGIN_ID + ".add.string"; //$NON-NLS-1$
+    //    private static final String ADD_STRING_ID=Activator.PLUGIN_ID + ".add.string"; //$NON-NLS-1$
 
     private static final String KEY_NAME="name"; //$NON-NLS-1$
     private static final String KEY_TYPE="type"; //$NON-NLS-1$

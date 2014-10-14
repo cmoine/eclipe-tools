@@ -178,7 +178,7 @@
             id="org.eclipse.etools.ei18n.quickAssistProcessor">
       </quickAssistProcessor>
       <quickAssistProcessor
-            class="org.eclipse.etools.efavorites.correction.EFavoritesQuickFix"
+            class="org.eclipse.etools.efavorites.correction.EFavoritesQuickAssistProcessor"
             id="org.eclipse.etools.efavorites.correction.EFavoritesQuickFix">
       </quickAssistProcessor>
    </extension>
@@ -412,7 +412,7 @@ public class Messages extends NLS {
             label="e-Favorites">
          <action
                class="org.eclipse.etools.efavorites.actions.EFavoritesAction"
-               icon="icons/enabled-star.png"
+               icon="icons/efavorites/enabled-star.png"
                id="org.eclipse.etools.efavorites.actions.EFavoritesAction"
                label="Favorites"
                style="pulldown"
@@ -434,19 +434,6 @@ public class Messages extends NLS {
       </startup>
    </extension>
    <extension
-         point="org.eclipse.ui.commands">
-      <command
-            categoryId="org.eclipse.etools.efavorites.category1"
-            defaultHandler="org.eclipse.etools.efavorites.handlers.EFavoritesHandler"
-            id="org.eclipse.etools.efavorites.command1"
-            name="Open Favorites">
-      </command>
-      <category
-            id="org.eclipse.etools.efavorites.category1"
-            name="EFavorites">
-      </category>
-   </extension>
-   <extension
          point="org.eclipse.ui.bindings">
       <key
             commandId="org.eclipse.etools.efavorites.command1"
@@ -459,14 +446,6 @@ public class Messages extends NLS {
   <!-- ***************************************************************
                              CODE ANALYSIS
    ********************************************************************-->
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            defaultHandler="org.eclipse.etools.codeanalysis.FindDeadCodeHandler"
-            id="org.eclipse.etools.codeanalysis.calculateUsage"
-            name="Find Dead Code">
-      </command>
-   </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
@@ -482,39 +461,46 @@ public class Messages extends NLS {
    </extension>
    <extension
          point="org.eclipse.ui.commands">
+      <category
+            id="org.eclipse.etools.category1"
+            name="Etools">
+      </category>
       <command
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.eshell.EShellCommand"
+            id="org.eclipse.etools.eshell.shellOpen"
+            name="Etool Open">
+      </command>
+      <command
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.eshell.EShellCommand"
+            id="org.eclipse.etools.eshell.shellExplore"
+            name="Etool Explore">
+      </command>
+      <command
+            categoryId="org.eclipse.etools.category1"
             defaultHandler="org.eclipse.etools.xsdgen.XsdGenHandler"
             id="net.cmoine.xsdgen.command1"
             name="Generate XSD">
       </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            id="org.eclipse.etools.eshell.category1"
-            name="EShell">
-      </category>
       <command
-            categoryId="org.eclipse.etools.eshell.category1"
-            id="org.eclipse.etools.eshell.shellOpen"
-            name="EShell Open">
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.ei18n.handler.SynchronizeHandler"
+            id="org.eclipse.etools.ei18n.handler.SynchronizeHandler"
+            name="EI18N Synchronise">
       </command>
       <command
-            categoryId="org.eclipse.etools.eshell.category1"
-            id="org.eclipse.etools.eshell.shellExplore"
-            name="EShell Explore">
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.codeanalysis.FindDeadCodeHandler"
+            id="org.eclipse.etools.codeanalysis.calculateUsage"
+            name="Find Dead Code">
       </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            class="org.eclipse.etools.eshell.EShellCommand"
-            commandId="org.eclipse.etools.eshell.shellOpen">
-      </handler>
-      <handler
-            class="org.eclipse.etools.eshell.EShellCommand"
-            commandId="org.eclipse.etools.eshell.shellExplore">
-      </handler>
+      <command
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.efavorites.handlers.EFavoritesHandler"
+            id="org.eclipse.etools.efavorites.command1"
+            name="Open Favorites">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -584,6 +570,16 @@ public class Messages extends NLS {
                   commandId="org.eclipse.etools.codeanalysis.calculateUsage"
                   icon="icons/codeanalysis/dead.png"
                   label="Find Dead Code"
+                  style="push">
+            </command>
+            <separator
+                  name="eclipe-tools.separator3"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.etools.ei18n.handler.SynchronizeHandler"
+                  icon="icons/ei18n/sync.png"
+                  label="Synchronize Translated Messages"
                   style="push">
             </command>
          </menu>
