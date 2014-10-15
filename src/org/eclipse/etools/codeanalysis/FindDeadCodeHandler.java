@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.search2.internal.ui.SearchView;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PartInitException;
@@ -28,30 +27,11 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class FindDeadCodeHandler extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
-        ISelection rawSelection=HandlerUtil.getActiveMenuSelection(event);
-        List<IResource> resources=SelectionUtils.getResources(rawSelection);
+        List<IResource> resources=SelectionUtils.getResources(HandlerUtil.getActiveMenuSelection(event));
 
         final List<ICompilationUnit> cus=new ArrayList<ICompilationUnit>();
         for (IResource res : resources) {
             try {
-                //                IWorkspaceRoot root=ResourcesPlugin.getWorkspace().getRoot();
-                //                IResource res=null;
-                //                for (IFile iFile : root.findFilesForLocationURI(file.toURI())) {
-                //                    if (iFile.exists()) {
-                //                        res=iFile;
-                //                        break;
-                //                    }
-                //                }
-                //                if (res == null) {
-                //                    for (IContainer container : root.findContainersForLocationURI(file.toURI())) {
-                //                        if (container.exists()) {
-                //                            res=container;
-                //                            break;
-                //                        }
-                //                    }
-                //                }
-                //
-                //                if (res != null) {
                 if (JavaCore.create(res.getProject()) != null) {
                     res.accept(new IResourceVisitor() {
                         public boolean visit(IResource resource) throws CoreException {
@@ -65,7 +45,6 @@ public class FindDeadCodeHandler extends AbstractHandler {
                         }
                     }, IResource.DEPTH_INFINITE, IResource.NONE);
                 }
-                //                }
             } catch (CoreException e) {
                 Activator.logError("Failed detecting dead code in " + res, e); //$NON-NLS-1$
             }

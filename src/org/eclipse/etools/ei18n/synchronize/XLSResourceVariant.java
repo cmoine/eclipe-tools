@@ -12,6 +12,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.team.core.TeamException;
 import org.eclipse.team.core.variants.IResourceVariant;
 
@@ -51,8 +52,9 @@ public class XLSResourceVariant extends AbstractResourceVariant {
         StringBuffer buf=new StringBuffer();
         for (String line : IOUtils.readLines(new ByteArrayInputStream(baos.toByteArray()))) {
             line=StringUtils.trimToEmpty(line);
-            if ((!line.isEmpty()) && !line.startsWith("#")) //$NON-NLS-1$
-                buf.append(line).append(IOUtils.LINE_SEPARATOR);
+            if (!line.isEmpty() && !line.startsWith("#")) { //$NON-NLS-1$
+                buf.append(line).append(System.getProperty(Platform.PREF_LINE_SEPARATOR));
+            }
         }
         return new ByteArrayInputStream(buf.toString().getBytes());
     }

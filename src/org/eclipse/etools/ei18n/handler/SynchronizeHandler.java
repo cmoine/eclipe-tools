@@ -10,11 +10,11 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.etools.Activator;
+import org.eclipse.etools.SelectionUtils;
 import org.eclipse.etools.ei18n.synchronize.EI18NSynchronizeParticipant;
 import org.eclipse.etools.ei18n.util.EI18NFile;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.team.ui.TeamUI;
 import org.eclipse.team.ui.synchronize.ISynchronizeParticipant;
 import org.eclipse.team.ui.synchronize.ISynchronizeScope;
@@ -23,25 +23,14 @@ import org.eclipse.team.ui.synchronize.SubscriberParticipant;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.google.common.collect.Lists;
-
 public class SynchronizeHandler extends AbstractHandler implements IHandler {
 
     public Object execute(ExecutionEvent event) throws ExecutionException {
+        ISelection sel=HandlerUtil.getActiveMenuSelectionChecked(event);
         File file=EI18NFile.promptFile(HandlerUtil.getActiveShell(event));
         if (file != null) {
             try {
-                List<IResource> resources=Lists.newArrayList();
-                for (Object obj : ((IStructuredSelection) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection()).toList()) {
-                    if (obj instanceof IResource) {
-                        resources.add((IResource) obj);
-                    }
-                    if (obj instanceof IAdaptable) {
-                        IResource res=(IResource) ((IAdaptable) obj).getAdapter(IResource.class);
-                        if (res != null)
-                            resources.add(res);
-                    }
-                }
+                List<IResource> resources=SelectionUtils.getResources(sel);
 
                 // First check if there is an existing matching participant
                 IResource[] resourcesArray=resources.toArray(new IResource[] {});

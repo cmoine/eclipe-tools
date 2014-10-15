@@ -3,8 +3,6 @@ package org.eclipse.etools.ei18n.synchronize;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -15,14 +13,14 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
+import org.eclipse.jface.text.DefaultLineTracker;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.team.core.TeamException;
 import org.eclipse.team.core.variants.IResourceVariant;
-
-import com.google.common.collect.Lists;
 
 abstract class AbstractResourceVariant implements IResourceVariant {
     private final String path;
@@ -76,46 +74,49 @@ abstract class AbstractResourceVariant implements IResourceVariant {
                     }
                 }
             }
-            List<String> actualLines=Collections.emptyList();
+            DefaultLineTracker lineTracker=new DefaultLineTracker();
             if (iFile != null) {
                 InputStream stream=null;
                 try {
                     stream=iFile.getContents();
-                    actualLines=Arrays.asList(StringUtils.splitPreserveAllTokens(IOUtils.toString(stream), '\n'));
-                } catch (CoreException e) {
-                    Activator.logError("Failed to read " + iFile, e); //$NON-NLS-1$
+                    String content=IOUtils.toString(stream);
+                    lineTracker.set(content);
+                    is=createInputStream();
+                    if (is != null) {
+                        List<String> lines=IOUtils.readLines(is);
+                        IOUtils.closeQuietly(is);
+
+                        StringBuffer buf=new StringBuffer();
+                        for (int i=0; i < lineTracker.getNumberOfLines(); i++) {
+                            IRegion region=lineTracker.getLineInformation(i);
+                            String lineDelimiter=lineTracker.getLineDelimiter(i);
+                            String actualLine=content.substring(region.getOffset(), region.getOffset() + region.getLength());
+                            boolean found=false;
+                            for (String line : lines) {
+                                if (equals(actualLine, line)) {
+                                    lines.remove(line);
+                                    buf.append(line).append(lineDelimiter);
+                                    found=true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                buf.append(actualLine);
+                                if (lineDelimiter != null)
+                                    buf.append(lineDelimiter);
+                            }
+                        }
+                        for (String line : lines) {
+                            if (!line.trim().startsWith("#")) //$NON-NLS-1$
+                                buf.append(line).append(System.getProperty(Platform.PREF_LINE_SEPARATOR));
+                        }
+                        return createStorage(buf.toString());
+                    }
                 } finally {
                     IOUtils.closeQuietly(stream);
                 }
             }
-            is=createInputStream();
-            if (is != null) {
-                List<String> lines=IOUtils.readLines(is);
-                IOUtils.closeQuietly(is);
-                List<String> modifiedLines=Lists.newArrayList();
-                for (String actualLine : actualLines) {
-                    boolean found=false;
-                    for (String line : lines) {
-                        if (equals(actualLine, line)) {
-                            lines.remove(line);
-                            modifiedLines.add(line);
-                            found=true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        modifiedLines.add(actualLine);
-                    }
-                }
-                for (String line : lines) {
-                    if (!line.trim().startsWith("#")) //$NON-NLS-1$
-                        modifiedLines.add(line);
-                }
-                return createStorage(StringUtils.join(modifiedLines.toArray(), "\n")); //$NON-NLS-1$
-            } else {
-                return createStorage("ERROR"); //$NON-NLS-1$
-            }
-        } catch (IOException e) {
+        } catch (Exception e) {
             Activator.logError("Failed fetching member", e); //$NON-NLS-1$
             ByteArrayOutputStream baos=new ByteArrayOutputStream();
             e.printStackTrace(new PrintWriter(baos));
@@ -123,6 +124,7 @@ abstract class AbstractResourceVariant implements IResourceVariant {
         } finally {
             IOUtils.closeQuietly(is);
         }
+        return createStorage("ERROR"); //$NON-NLS-1$
     }
 
     private IStorage createStorage(String content) {

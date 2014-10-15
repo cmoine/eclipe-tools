@@ -6,11 +6,13 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.etools.RemoveMe;
 //import org.eclipse.team.core.variants.ResourceVariantTree;
 //import org.eclipse.team.core.variants.SessionResourceVariantByteStore;
 import org.eclipse.team.core.variants.ResourceVariantTree;
 import org.eclipse.team.core.variants.SessionResourceVariantByteStore;
 
+@RemoveMe
 public class ZIPSubscriber extends AbstractSubscriber {
     // private final IResource[] roots;
 

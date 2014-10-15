@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 
 @RemoveMe
-public class EI18NSynchronizeParticipant extends SubscriberParticipant /* ScopableSubscriberParticipant implements ISynchronizeParticipant */{
+public class EI18NSynchronizeParticipant extends SubscriberParticipant {
 	public static final String ID=EI18NSynchronizeParticipant.class.getName();
 
 	public EI18NSynchronizeParticipant(ISynchronizeScope scope, File file) throws ZipException, IOException {

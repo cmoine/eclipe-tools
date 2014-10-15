@@ -18,10 +18,15 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.etools.ei18n.extensions.ImpexExtension;
+import org.eclipse.etools.ei18n.extensions.ImpexExtensionManager;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -141,7 +146,13 @@ public class EI18NFile {
 
 	public static File promptFile(Shell shell) {
 		FileDialog dialog=new FileDialog(shell);
-        dialog.setFilterExtensions(new String[] { "*.ei18n;*.zip;*.xls", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ 
+        String extensions=Joiner.on(';').join(
+                Iterables.transform(ImpexExtensionManager.getInstance().getApplications(), new Function<ImpexExtension, String>() {
+                    public String apply(ImpexExtension ext) {
+                        return "*." + ext.getFileExtension(); //$NON-NLS-1$
+                    }
+                }));
+        dialog.setFilterExtensions(new String[] { extensions, "*.*" }); //$NON-NLS-1$ 
 		String filePath=dialog.open();
 		if (filePath != null) {
 			return new File(filePath);

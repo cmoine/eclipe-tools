@@ -6,11 +6,13 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.team.core.TeamException;
 import org.eclipse.team.core.variants.IResourceVariant;
 
 import com.google.common.collect.Lists;
 
+@RemoveMe
 public class ZIPResourceVariant extends AbstractResourceVariant {
     private final ZIPSubscriber subscriber;
 

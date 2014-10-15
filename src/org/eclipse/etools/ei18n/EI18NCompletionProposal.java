@@ -189,7 +189,7 @@ public class EI18NCompletionProposal extends AbstractJavaCompletionProposal {
                         buf.append('\n');
                     }
                     buf.append(fieldName);
-                    buf.append(':');
+                    buf.append('=');
                     buf.append(getStringLiteral());
                     messagesFile.appendContents(new ByteArrayInputStream(buf.toString().getBytes(messagesFile.getCharset())), true, true, null);
                 } finally {

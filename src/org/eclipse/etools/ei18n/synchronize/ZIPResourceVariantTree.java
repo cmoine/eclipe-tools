@@ -1,8 +1,10 @@
 package org.eclipse.etools.ei18n.synchronize;
 
 
+import org.eclipse.etools.RemoveMe;
 import org.eclipse.team.core.variants.ResourceVariantByteStore;
 
+@RemoveMe
 public class ZIPResourceVariantTree extends AbstractResourceVariantTree {
     // private final ZipFile file;
 

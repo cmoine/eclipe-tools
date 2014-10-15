@@ -46,9 +46,9 @@ public class XLSSubscriber extends AbstractSubscriber {
             		continue;
             	}
                 String cellValue=firstRow.getCell(col).getStringCellValue();
-                if (StringUtils.equalsIgnoreCase(cellValue, "key")) {
+                if (StringUtils.equalsIgnoreCase(cellValue, "key")) { //$NON-NLS-1$
                     keyCol=col;
-                } else if (StringUtils.contains(cellValue.toLowerCase(), "default")) {
+                } else if (StringUtils.contains(cellValue.toLowerCase(), "default")) { //$NON-NLS-1$
                     defaultCol=col;
                 } else if (StringUtils.isNotEmpty(cellValue)) {
                     translations.put(cellValue.trim(), col);

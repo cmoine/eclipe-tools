@@ -1,5 +1,6 @@
 package org.eclipse.etools.ei18n.wizards;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,9 +13,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.SelectionUtils;
 import org.eclipse.etools.ei18n.EI18NImage;
+import org.eclipse.etools.ei18n.extensions.IImpex;
 import org.eclipse.etools.ei18n.extensions.ImpexExtension;
 import org.eclipse.etools.ei18n.extensions.ImpexExtensionManager;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
@@ -39,6 +42,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -319,8 +323,16 @@ public class ExportWizardEi18nPage extends WizardDataTransferPage {
 
         saveWidgetValues();
 
-        return executeOperation(getSelectedImpex().getApplication().getExportOperation(
-                Iterables.filter(Arrays.asList(viewer.getCheckedElements()), IFile.class), getDestinationValue()));
+        final File dst=new File(getDestinationValue());
+        final Iterable<IFile> files=Iterables.filter(Arrays.asList(viewer.getCheckedElements()), IFile.class);
+        final IImpex impex=getSelectedImpex().getApplication();
+        return executeOperation(new IRunnableWithProgress() {
+            public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                impex.export(files, dst, monitor);
+                Program.launch(dst.getPath());
+            }
+        });
+
     }
 
     private boolean executeOperation(IRunnableWithProgress op) {
@@ -329,6 +341,7 @@ public class ExportWizardEi18nPage extends WizardDataTransferPage {
         } catch (InterruptedException e) {
             return false;
         } catch (InvocationTargetException e) {
+            Activator.logError("Failed exporting", e); //$NON-NLS-1$
             displayErrorDialog(e.getTargetException());
             return false;
         }
