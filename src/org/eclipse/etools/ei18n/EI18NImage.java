@@ -1,8 +1,11 @@
 package org.eclipse.etools.ei18n;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.etools.Activator;
+import org.eclipse.etools.ei18n.util.EI18NConstants;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
@@ -35,6 +38,17 @@ public enum EI18NImage {
 	public ImageDescriptor getImageDescriptor() {
 		return IMAGE_REGISTRY.getDescriptor(path);
 	}
+
+    public static Image getImage(IFile file) {
+        Matcher matcher;
+        if ((matcher=EI18NConstants.LOCALE_PATTERN.matcher(file.getName())).matches()) {
+            String resourcePath="/icons/ei18n/flags/" + matcher.group(1) + ".png"; //$NON-NLS-1$ //$NON-NLS-2$
+            if (Activator.getDefault().getBundle().getResource(resourcePath) != null)
+                return IMAGE_REGISTRY.get(resourcePath);
+        }
+
+        return LOGO_16.getImage();
+    }
 
     public static Image getImage(Locale locale) {
         if (locale != null) {

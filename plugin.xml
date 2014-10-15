@@ -125,14 +125,14 @@
          point="org.eclipse.ui.exportWizards">
       <category
             id="org.eclipse.etools.ei18n.category.ei18n"
-            name="e-i18n">
+            name="Etools">
       </category>
       <wizard
             category="org.eclipse.etools.ei18n.category.ei18n"
             class="org.eclipse.etools.ei18n.wizards.ExportWizardEi18n"
             icon="icons/ei18n/localizedProperties.png"
             id="org.eclipse.etools.ei18n.wizard.export"
-            name="Export e-i18n">
+            name="Export Translated Messages">
       </wizard>
    </extension>
    <extension

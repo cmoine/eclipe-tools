@@ -13,7 +13,7 @@ import org.eclipse.etools.Activator;
 import com.google.common.collect.Lists;
 
 public class JavaMappingExtensionManager {
-    private static final String EXTENSION_ID="com.cmoine.ei18n.javaMapping"; //$NON-NLS-1$
+    private static final String EXTENSION_ID="org.eclipse.etools.ei18n.javaMapping"; //$NON-NLS-1$
 
     private static JavaMappingExtensionManager instance;
 

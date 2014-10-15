@@ -125,14 +125,14 @@ public class EFavoritesAction implements IWorkbenchWindowPulldownDelegate {
                 item.setText(iFile.getName());
 				item.addListener(SWT.Selection, new Listener() {
 					public void handleEvent(Event event) {
-                        ((EFavorite) event.data).open();
+                        iFile.open();
 					}
 				});
                 if (iFile.getImage() != null)
                     item.setImage(iFile.getImage());
                 item.addDisposeListener(new DisposeListener() {
                     public void widgetDisposed(DisposeEvent e) {
-                        ((EFavorite) e.data).dispose();
+                        iFile.dispose();
                     }
                 });
 			} else {

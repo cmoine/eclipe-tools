@@ -1,18 +1,17 @@
 package org.eclipse.etools.ei18n.impex;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.record.CFRuleRecord.ComparisonOperator;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFConditionalFormattingRule;
@@ -27,21 +26,28 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.extensions.IImpex;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
+import org.eclipse.etools.ei18n.util.EI18NUtil;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 public class ExcelImpex implements IImpex {
     protected static final int STARTING_COLUMN=1;
+
+    private static class Line {
+        private final IFile mainFile;
+        private final Map<String, IFile> files=new HashMap<String, IFile>();
+
+        public Line(IFile file) {
+            mainFile=file;
+        }
+    }
 
     public IRunnableWithProgress getExportOperation(final Iterable<IFile> iterable, final String destinationValue) {
         return new IRunnableWithProgress() {
@@ -68,16 +74,30 @@ public class ExcelImpex implements IImpex {
                     cell.setCellStyle(headerStyle);
 
                     // Organize file into multimap
-                    Multimap<IFile, IFile> files=HashMultimap.create();
-                    Collection<String> locales=Sets.newHashSet();
+                    //                    Multimap<IFile, IFile> files=HashMultimap.create();
+                    Map<Line, Line> lines=new HashMap<Line, Line>();
+                    Set<String> locales=Sets.newTreeSet();
                     for (IFile file : iterable) {
-                        Matcher matcher=EI18NConstants.LOCALE_PATTERN.matcher(file.getName());
-                        if (matcher.matches()) {
-                            IFile defaultFile=file.getParent().getFile(new Path(StringUtils.substringBefore(file.getName(), "_") + ".properties")); //$NON-NLS-1$
-                            if (defaultFile.exists()) {
-                                files.put(defaultFile, file);
-                                locales.add(matcher.group(1));
+                        Matcher matcher=null;
+                        if ((matcher=EI18NConstants.PATTERN.matcher(file.getName())).matches()) {
+                            Line line=new Line(file);
+                            if (!lines.containsKey(line)) {
+                                lines.put(line, line);
+                            } else {
+                                line=lines.get(line);
                             }
+                        } else if ((matcher=EI18NConstants.LOCALE_PATTERN.matcher(file.getName())).matches()) {
+                            IFile defaultFile=EI18NUtil.getDefaultFile(file);
+
+                            Line line=new Line(defaultFile);
+                            if (!lines.containsKey(line)) {
+                                lines.put(line, line);
+                            } else {
+                                line=lines.get(line);
+                            }
+
+                            line.files.put(matcher.group(1), file);
+                            locales.add(matcher.group(1));
                         }
                     }
                     {
@@ -90,16 +110,18 @@ public class ExcelImpex implements IImpex {
                     }
 
                     int maxCols=0;
-                    for (IFile file : files.keySet()) {
+                    for (Line line : lines.keySet()) {
                         Properties props=new Properties();
-                        is=file.getContents();
+                        is=line.mainFile.getContents();
                         props.load(is);
                         is.close();
                         List<Properties> propsList=Lists.newArrayList();
                         for (String locale : locales) {
                             Properties localeProps=new Properties();
                             propsList.add(localeProps);
-                            for (IFile localeFile : files.get(file)) {
+                            //                            for (IFile localeFile : line.files.get(locale)) {
+                            IFile localeFile=line.files.get(locale);
+                            if (localeFile != null) {
                                 Matcher matcher=EI18NConstants.LOCALE_PATTERN.matcher(localeFile.getName());
                                 Assert.isTrue(matcher.matches());
                                 if (locale.equals(matcher.group(1))) {
@@ -109,11 +131,12 @@ public class ExcelImpex implements IImpex {
                                     is.close();
                                 }
                             }
+                            //                            }
                         }
                         for (String key : Iterables.filter(Collections.list(props.keys()), String.class)) {
                             HSSFRow row=sheet.createRow(rownum++);
                             int col=STARTING_COLUMN;
-                            row.createCell(col++).setCellValue(file.getFullPath().toString() + "#" + key); //$NON-NLS-1$
+                            row.createCell(col++).setCellValue(line.mainFile.getFullPath().toString() + "#" + key); //$NON-NLS-1$
                             row.createCell(col++).setCellValue((String) props.get(key));
                             for (Properties localeProps : propsList) {
                                 HSSFCell cell2=row.createCell(col++);
@@ -131,11 +154,8 @@ public class ExcelImpex implements IImpex {
                         sheet.autoSizeColumn(col);
                     os=new FileOutputStream(destinationValue);
                     wb.write(os);
-                } catch (FileNotFoundException e) {
-                    throw new InvocationTargetException(e);
-                } catch (IOException e) {
-                    throw new InvocationTargetException(e);
-                } catch (CoreException e) {
+                } catch (Exception e) {
+                    Activator.logError("Failed to export", e); //$NON-NLS-1$
                     throw new InvocationTargetException(e);
                 } finally {
                     IOUtils.closeQuietly(os);
@@ -144,7 +164,6 @@ public class ExcelImpex implements IImpex {
             }
         };
     }
-
 
     public String getFileExtension() {
         return "*.xls"; //$NON-NLS-1$

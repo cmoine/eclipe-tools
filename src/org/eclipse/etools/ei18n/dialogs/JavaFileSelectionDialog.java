@@ -36,7 +36,6 @@ import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 public final class JavaFileSelectionDialog extends AbstractFileSelectionDialog {
     public JavaFileSelectionDialog(Shell parent, String message, IProject project, IFile initialSelection) {
         super(parent, message, project);
-        //        super(parent, new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT), new StandardJavaElementContentProvider());
         setValidator(new ISelectionStatusValidator() {
             public IStatus validate(Object[] selection) {
                 if (selection.length > 0 && selection[0].getClass() == org.eclipse.jdt.internal.core.CompilationUnit.class)
@@ -45,10 +44,6 @@ public final class JavaFileSelectionDialog extends AbstractFileSelectionDialog {
                     return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "You must select a compilation unit");
             }
         });
-        //        setComparator(new JavaElementComparator());
-        //        setTitle(getShell().getText());
-        //                setTitle(NewWizardMessages.NewFContainerWizardPage_ChooseSourceContainerDialog_title);
-        //        setMessage(message);
         addFilter(new ViewerFilter() {
             @Override
             public boolean select(Viewer viewer, Object parentElement, Object element) {

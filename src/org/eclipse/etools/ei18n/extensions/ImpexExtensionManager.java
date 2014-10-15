@@ -13,7 +13,7 @@ import org.eclipse.etools.Activator;
 import com.google.common.collect.Lists;
 
 public class ImpexExtensionManager {
-    private static final String EXTENSION_ID="com.cmoine.ei18n.impex"; //$NON-NLS-1$
+    private static final String EXTENSION_ID="org.eclipse.etools.ei18n.impex"; //$NON-NLS-1$
 
     /**
      * ApplicationExtension unique id

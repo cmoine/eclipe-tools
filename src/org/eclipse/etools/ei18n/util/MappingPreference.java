@@ -24,6 +24,10 @@ public class MappingPreference {
         keyFile=propertyFile.toString();
     }
 
+    public IFile getPropertyFile() {
+        return propertyFile;
+    }
+
     public IFile getJavaFile() {
         String value=prefs.get(keyFile, null);
         if (value != null) {

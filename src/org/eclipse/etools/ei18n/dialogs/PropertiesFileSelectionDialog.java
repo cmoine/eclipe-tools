@@ -60,7 +60,6 @@ public final class PropertiesFileSelectionDialog extends AbstractFileSelectionDi
     protected void createButtonPressed() {
         try {
             IAdaptable selection=(IAdaptable) ((IStructuredSelection) getTreeViewer().getSelection()).getFirstElement();
-            //            IPackageFragment packageFragment=(IPackageFragment);
             final IFolder folder=(IFolder) selection.getAdapter(IFolder.class);
             InputDialog dialog=new InputDialog(getShell(), getShell().getText(), "Type a property file name please", "messages.properties",
                     new IInputValidator() {

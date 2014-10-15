@@ -14,7 +14,7 @@ import org.eclipse.etools.ei18n.services.ITranslatorService;
 import com.google.common.collect.Lists;
 
 public class TranslatorExtensionManager {
-    private static final String EXTENSION_ID="com.cmoine.ei18n.translator"; //$NON-NLS-1$
+    private static final String EXTENSION_ID="org.eclipse.etools.ei18n.translator"; //$NON-NLS-1$
 
     /**
      * ApplicationExtension unique id
