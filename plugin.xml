@@ -419,6 +419,26 @@ public class Messages extends NLS {
                toolbarPath="Normal/additions">
          </action>
       </actionSet>
+      <actionSet
+            id="eclipe-tools.actionSet1"
+            label="e-Markers">
+         <action
+               class="org.eclipse.etools.emarkers.GlobalPreviousMarkerAction"
+               icon="platform:/plugin/org.eclipse.ui.editors/icons/full/etool16/prev_nav.gif"
+               id="org.eclipse.etools.emarkers.GlobalPreviousMarkerAction"
+               label="Previous Marker"
+               style="pulldown"
+               toolbarPath="Normal/additions">
+         </action>
+         <action
+               class="org.eclipse.etools.emarkers.GlobalNextMarkerAction"
+               icon="platform:/plugin/org.eclipse.ui.editors/icons/full/etool16/next_nav.gif"
+               id="org.eclipse.etools.emarkers.GlobalNextMarkerAction"
+               label="Next Marker"
+               style="pulldown"
+               toolbarPath="Normal/additions">
+         </action>
+      </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.editorActions">
@@ -440,6 +460,18 @@ public class Messages extends NLS {
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+SHIFT+E">
+      </key>
+      <key
+            commandId="org.eclipse.etools.emarkers.GlobalNextMarkerAction"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+ALT+ARROW_RIGHT">
+      </key>
+      <key
+            commandId="org.eclipse.etools.emarkers.GlobalPreviousMarkerAction"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+ALT+ARROW_LEFT">
       </key>
    </extension>
 
@@ -511,6 +543,18 @@ public class Messages extends NLS {
             defaultHandler="org.eclipse.etools.efavorites.handlers.EFavoritesHandler"
             id="org.eclipse.etools.efavorites.command1"
             name="Open Favorites">
+      </command>
+      <command
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.emarkers.GlobalNextMarkerAction"
+            id="org.eclipse.etools.emarkers.GlobalNextMarkerAction"
+            name="Next Marker">
+      </command>
+      <command
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.emarkers.GlobalPreviousMarkerAction"
+            id="org.eclipse.etools.emarkers.GlobalPreviousMarkerAction"
+            name="Previous Marker">
       </command>
    </extension>
    <extension
