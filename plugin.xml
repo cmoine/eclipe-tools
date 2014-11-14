@@ -648,6 +648,12 @@ public class Messages extends NLS {
             id="eclipe-tools.viewPage1"
             searchResultClass="org.eclipse.etools.codeanalysis.EtoolsSearchResult">
       </viewPage>
+      <viewPage
+            class="org.eclipse.etools.ei18n.search.EI18NSearchResultPage"
+            icon="icons/ei18n/translation.png"
+            id="org.eclipse.etools.ei18n.EI18NTextSearchResult"
+            searchResultClass="org.eclipse.etools.ei18n.search.EI18NTextSearchResult">
+      </viewPage>
    </extension>
    <extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
