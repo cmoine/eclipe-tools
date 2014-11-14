@@ -13,18 +13,23 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.PlatformUI;
 
 public class SelectionUtils {
     private SelectionUtils() {
     }
 
-    public static List<File> getFiles(ISelection rawSelection) {
+    private static List<File> getFiles(ISelection rawSelection) {
         List<File> files=new ArrayList<File>();
         if (rawSelection instanceof TextSelection) {
-            IResource res=null;
-            if (res != null)
-                files.add(res.getLocation().toFile());
+            IEditorPart activeEditor=PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+            if (activeEditor != null) {
+                IResource res=(IResource) activeEditor.getEditorInput().getAdapter(IResource.class);
+                if (res != null)
+                    files.add(res.getLocation().toFile());
+            }
         } else {
             //            selection=(IStructuredSelection) rawSelection;
             for (Object o : ((IStructuredSelection) rawSelection).toArray()) {

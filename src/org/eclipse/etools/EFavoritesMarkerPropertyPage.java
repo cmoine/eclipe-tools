@@ -1,4 +1,4 @@
-package org.eclipse.etools.efavorites;
+package org.eclipse.etools;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -49,9 +49,11 @@ import com.google.common.collect.Sets;
 
 public class EI18NCompletionProposal extends AbstractJavaCompletionProposal {
     private final IInvocationContext context;
+    private final String displayString;
 
     public EI18NCompletionProposal(IInvocationContext context) {
         this.context=context;
+        displayString=MessageFormat.format("Externalize \"{0}\"", ((StringLiteral) context.getCoveringNode()).getLiteralValue());
     }
 
     protected Shell getShell() {
@@ -84,7 +86,12 @@ public class EI18NCompletionProposal extends AbstractJavaCompletionProposal {
 
     @Override
     public String getDisplayString() {
-        return MessageFormat.format("Externalize \"{0}\"", ((StringLiteral) context.getCoveringNode()).getLiteralValue());
+        return displayString;
+    }
+
+    @Override
+    public String getSortString() {
+        return displayString;
     }
 
     @Override

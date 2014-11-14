@@ -481,7 +481,7 @@ public class Messages extends NLS {
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            class="org.eclipse.etools.efavorites.EFavoritesMarkerPropertyPage"
+            class="org.eclipse.etools.EFavoritesMarkerPropertyPage"
             id="org.eclipse.etools.efavorites.EFavoritesMarkerPropertyPage"
             name="e-tools">
             <enabledWhen>
@@ -556,6 +556,12 @@ public class Messages extends NLS {
             id="org.eclipse.etools.emarkers.GlobalPreviousMarkerAction"
             name="Previous Marker">
       </command>
+      <command
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.ei18n.actions.ValidateNLSHandler"
+            id="org.eclipse.etools.ei18n.actions.ValidateNLSHandler"
+            name="Validate NLS Messages">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -599,6 +605,12 @@ public class Messages extends NLS {
                   commandId="org.eclipse.etools.ei18n.handler.SynchronizeHandler"
                   icon="icons/ei18n/sync.png"
                   label="Synchronize Translated Messages"
+                  style="push">
+            </command>
+            <command
+                  commandId="org.eclipse.etools.ei18n.actions.ValidateNLSHandler"
+                  icon="icons/ei18n/validate.gif"
+                  label="Validate NLS Messages"
                   style="push">
             </command>
          </menu>
