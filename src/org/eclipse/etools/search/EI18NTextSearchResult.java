@@ -1,4 +1,4 @@
-package org.eclipse.etools.ei18n.search;
+package org.eclipse.etools.search;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.etools.ei18n.EI18NImage;
@@ -13,31 +13,28 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-
 public final class EI18NTextSearchResult extends AbstractTextSearchResult implements IFileMatchAdapter, IEditorMatchAdapter {
-    public static class Infos {
-        private final Match match;
-        private final String message;
-
-        public Infos(Match match, String message) {
-            this.match=match;
-            this.message=message;
-        }
-
-        public Match getMatch() {
-            return match;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-    }
+    //    public static class Infos {
+    //        private final Match match;
+    //        private final String message;
+    //
+    //        public Infos(Match match, String message) {
+    //            this.match=match;
+    //            this.message=message;
+    //        }
+    //
+    //        public Match getMatch() {
+    //            return match;
+    //        }
+    //
+    //        public String getMessage() {
+    //            return message;
+    //        }
+    //    }
 
     private static final Match[] EMPTY_ARR=new Match[0];
 
-    private final Multimap<IFile, Infos> multimap=HashMultimap.create();
+    //    private final Multimap<IFile, Infos> multimap=HashMultimap.create();
 
     private final ISearchQuery query;
 
@@ -92,16 +89,12 @@ public final class EI18NTextSearchResult extends AbstractTextSearchResult implem
         return EMPTY_ARR;
     }
 
-    public void addMatch(Match match, IFile file, String message) {
-        addMatch(match);
-        multimap.put(file, new Infos(match, message));
-    }
-
-    //    public Collection<String> getElements(IFile file) {
-    //        return multimap.get(file);
+    //    public void addMatch(Match match, IFile file, String message) {
+    //        addMatch(match);
+    //        multimap.put(file, new Infos(match, message));
     //    }
-
-    public Multimap<IFile, Infos> getMultimap() {
-        return multimap;
-    }
+    //
+    //    public Multimap<IFile, Infos> getMultimap() {
+    //        return multimap;
+    //    }
 }

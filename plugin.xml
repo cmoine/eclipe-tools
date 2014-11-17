@@ -649,10 +649,10 @@ public class Messages extends NLS {
             searchResultClass="org.eclipse.etools.codeanalysis.EtoolsSearchResult">
       </viewPage>
       <viewPage
-            class="org.eclipse.etools.ei18n.search.EI18NSearchResultPage"
+            class="org.eclipse.etools.search.EI18NSearchResultPage"
             icon="icons/ei18n/translation.png"
             id="org.eclipse.etools.ei18n.EI18NTextSearchResult"
-            searchResultClass="org.eclipse.etools.ei18n.search.EI18NTextSearchResult">
+            searchResultClass="org.eclipse.etools.search.EI18NTextSearchResult">
       </viewPage>
    </extension>
    <extension

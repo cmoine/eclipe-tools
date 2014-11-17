@@ -1,4 +1,4 @@
-package org.eclipse.etools.ei18n.search;
+package org.eclipse.etools.search;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.TableViewer;

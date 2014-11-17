@@ -20,6 +20,7 @@ public enum EI18NImage {
     ADD_16("/icons/ei18n/add.gif"), //$NON-NLS-1$
     DELETE_16("/icons/ei18n/delete.gif"), //$NON-NLS-1$
     ERROR_16("/icons/ei18n/error.gif"), //$NON-NLS-1$
+    WARNING_16("/icons/ei18n/warning.gif"), //$NON-NLS-1$
     VALIDATE_16("/icons/ei18n/validate.gif"), //$NON-NLS-1$
     LOGO_16("/icons/ei18n/localizedProperties.png"); //$NON-NLS-1$
 

@@ -1,4 +1,4 @@
-package org.eclipse.etools.ei18n.search;
+package org.eclipse.etools.search;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

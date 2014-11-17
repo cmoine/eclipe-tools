@@ -12,17 +12,18 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.SelectionUtils;
+import org.eclipse.etools.search.EI18NTextSearchResult;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.search2.internal.ui.SearchView;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PartInitException;
+import org.eclipse.search.ui.ISearchQuery;
+import org.eclipse.search.ui.ISearchResult;
+import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 public class FindDeadCodeHandler extends AbstractHandler {
@@ -53,31 +54,64 @@ public class FindDeadCodeHandler extends AbstractHandler {
         if (cus.isEmpty()) {
             MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "Information", "Please select at least one compilation unit!");
         } else {
-            Job job=new Job("Searching Dead Code...") { //$NON-NLS-1$
-                @Override
-                protected IStatus run(IProgressMonitor monitor) {
-                    monitor.beginTask("Searching Dead Code...", cus.size()); //$NON-NLS-1$
-                    CodeAnalysis.calculate(cus, monitor);
-                    monitor.done();
-                    // Open view in the UI thread
-                    Display.getDefault().asyncExec(new Runnable() {
-                        public void run() {
-                            try {
-                                SearchView view=(SearchView) HandlerUtil.getActiveWorkbenchWindow(event).getActivePage()
-                                        .showView("org.eclipse.search.ui.views.SearchView");
-                                view.showSearchResult(CodeAnalysis.getSearchResult());
-                                view.queryAdded(CodeAnalysis.getSearchResult().getQuery());
-                            } catch (PartInitException e) {
-                                e.printStackTrace();
-                            }
-                        }
+            NewSearchUI.runQueryInBackground(new ISearchQuery() {
+                //                private final List<IResource> resources=SelectionUtils.getResources(selection);
 
-                    });
+                private final EI18NTextSearchResult searchResult=new EI18NTextSearchResult(this);
+
+                public IStatus run(IProgressMonitor monitor) throws OperationCanceledException {
+                    monitor.beginTask("Searching Dead Code...", cus.size());
+                    for (ICompilationUnit cu : cus) {
+                        CodeAnalysis.calculate(cu, searchResult);
+                        monitor.worked(1);
+                    }
+                    monitor.done();
+                    //                    process(monitor, searchResult, resources);
                     return Status.OK_STATUS;
                 }
-            };
-            job.setUser(true);
-            job.schedule();
+
+                public String getLabel() {
+                    return "Find Dead Code";
+                }
+
+                public boolean canRerun() {
+                    return true;
+                }
+
+                public boolean canRunInBackground() {
+                    return true;
+                }
+
+                public ISearchResult getSearchResult() {
+                    return searchResult;
+                }
+
+            });
+            //            Job job=new Job("Searching Dead Code...") { //$NON-NLS-1$
+            //                @Override
+            //                protected IStatus run(IProgressMonitor monitor) {
+            //                    monitor.beginTask("Searching Dead Code...", cus.size()); //$NON-NLS-1$
+            //                    CodeAnalysis.calculate(cus, monitor);
+            //                    monitor.done();
+            //                    // Open view in the UI thread
+            //                    Display.getDefault().asyncExec(new Runnable() {
+            //                        public void run() {
+            //                            try {
+            //                                SearchView view=(SearchView) HandlerUtil.getActiveWorkbenchWindow(event).getActivePage()
+            //                                        .showView("org.eclipse.search.ui.views.SearchView");
+            //                                view.showSearchResult(CodeAnalysis.getSearchResult());
+            //                                view.queryAdded(CodeAnalysis.getSearchResult().getQuery());
+            //                            } catch (PartInitException e) {
+            //                                e.printStackTrace();
+            //                            }
+            //                        }
+            //
+            //                    });
+            //                    return Status.OK_STATUS;
+            //                }
+            //            };
+            //            job.setUser(true);
+            //            job.schedule();
         }
 
 		return null;
