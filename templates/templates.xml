@@ -4,7 +4,7 @@
 import org.eclipse.osgi.util.NLS;
 
 public final class ${type_name} extends NLS { 
-	private static final String BUNDLE_NAME="${package_name}.messages"; //$NON-NLS-1$
+	private static final String BUNDLE_NAME="${package_name}.messages"; //$$NON-NLS-1$$
 
 	static {
 		// initialize resource bundle

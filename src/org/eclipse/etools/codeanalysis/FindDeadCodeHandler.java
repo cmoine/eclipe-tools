@@ -55,8 +55,6 @@ public class FindDeadCodeHandler extends AbstractHandler {
             MessageDialog.openInformation(HandlerUtil.getActiveShell(event), "Information", "Please select at least one compilation unit!");
         } else {
             NewSearchUI.runQueryInBackground(new ISearchQuery() {
-                //                private final List<IResource> resources=SelectionUtils.getResources(selection);
-
                 private final EI18NTextSearchResult searchResult=new EI18NTextSearchResult(this);
 
                 public IStatus run(IProgressMonitor monitor) throws OperationCanceledException {
@@ -66,7 +64,6 @@ public class FindDeadCodeHandler extends AbstractHandler {
                         monitor.worked(1);
                     }
                     monitor.done();
-                    //                    process(monitor, searchResult, resources);
                     return Status.OK_STATUS;
                 }
 
@@ -87,31 +84,6 @@ public class FindDeadCodeHandler extends AbstractHandler {
                 }
 
             });
-            //            Job job=new Job("Searching Dead Code...") { //$NON-NLS-1$
-            //                @Override
-            //                protected IStatus run(IProgressMonitor monitor) {
-            //                    monitor.beginTask("Searching Dead Code...", cus.size()); //$NON-NLS-1$
-            //                    CodeAnalysis.calculate(cus, monitor);
-            //                    monitor.done();
-            //                    // Open view in the UI thread
-            //                    Display.getDefault().asyncExec(new Runnable() {
-            //                        public void run() {
-            //                            try {
-            //                                SearchView view=(SearchView) HandlerUtil.getActiveWorkbenchWindow(event).getActivePage()
-            //                                        .showView("org.eclipse.search.ui.views.SearchView");
-            //                                view.showSearchResult(CodeAnalysis.getSearchResult());
-            //                                view.queryAdded(CodeAnalysis.getSearchResult().getQuery());
-            //                            } catch (PartInitException e) {
-            //                                e.printStackTrace();
-            //                            }
-            //                        }
-            //
-            //                    });
-            //                    return Status.OK_STATUS;
-            //                }
-            //            };
-            //            job.setUser(true);
-            //            job.schedule();
         }
 
 		return null;

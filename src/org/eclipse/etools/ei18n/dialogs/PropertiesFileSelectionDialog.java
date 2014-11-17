@@ -10,10 +10,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.etools.Activator;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -60,7 +58,7 @@ public final class PropertiesFileSelectionDialog extends AbstractFileSelectionDi
     protected void createButtonPressed() {
         try {
             IAdaptable selection=(IAdaptable) ((IStructuredSelection) getTreeViewer().getSelection()).getFirstElement();
-            final IFolder folder=(IFolder) selection.getAdapter(IFolder.class);
+            final IFolder folder=(IFolder) selection.getAdapter(IResource.class);
             InputDialog dialog=new InputDialog(getShell(), getShell().getText(), "Type a property file name please", "messages.properties",
                     new IInputValidator() {
                         public String isValid(String newText) {
@@ -77,9 +75,9 @@ public final class PropertiesFileSelectionDialog extends AbstractFileSelectionDi
             if (dialog.open() == Window.OK) {
                 IFile file=folder.getFile(dialog.getValue());
                 file.create(new NullInputStream(0L), true, new NullProgressMonitor());
-                IJavaElement newObj=JavaCore.create(file);
-                getTreeViewer().add(selection, newObj);
-                getTreeViewer().setSelection(new StructuredSelection(newObj));
+                //                IJavaElement newObj=JavaCore.create(file);
+                getTreeViewer().add(selection, file);
+                getTreeViewer().setSelection(new StructuredSelection(file));
             }
         } catch (Exception e) {
             Activator.logError("Failed creating button pressed", e); //$NON-NLS-1$

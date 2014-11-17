@@ -113,9 +113,8 @@ public class ValidateNLSHandler extends AbstractHandler implements IHandler {
                             // Find markers
                             try {
                                 DefaultLineTracker tracker=new DefaultLineTracker();
-                                String content=FileUtils.readFileToString(org.eclipse.etools.FileUtils.getResource(file));
+                                String content=FileUtils.readFileToString(org.eclipse.etools.FileUtils.getResource(file), file.getCharset());
                                 tracker.set(content);
-                                //                                List<String> lines=FileUtils.readLines(org.eclipse.etools.FileUtils.getResource(file));
                                 for (IMarker marker : file.findMarkers("org.eclipse.jdt.core.problem", false, IResource.DEPTH_ZERO)) { //$NON-NLS-1$
                                     if (((Integer) marker.getAttribute(IJavaModelMarker.ID)).intValue() == IProblem.NonExternalizedStringLiteral) {
                                         //                                        String message=(String) marker.getAttribute(IMarker.MESSAGE);
