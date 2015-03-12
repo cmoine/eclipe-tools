@@ -1,5 +1,7 @@
 package org.eclipse.etools.ei18n.synchronize;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -35,16 +37,13 @@ abstract class AbstractResourceVariant implements IResourceVariant {
         return !path.endsWith(".properties"); //$NON-NLS-1$
     }
 
-
     public String getName() {
         return getFilename();
     }
 
-
     public String getContentIdentifier() {
         return getPath();
     }
-
 
     public byte[] asBytes() {
         return getContentIdentifier().getBytes();
@@ -57,7 +56,6 @@ abstract class AbstractResourceVariant implements IResourceVariant {
     public String getPath() {
         return path;
     }
-
 
     public IStorage getStorage(IProgressMonitor monitor) throws TeamException {
         InputStream is=null;
@@ -75,47 +73,49 @@ abstract class AbstractResourceVariant implements IResourceVariant {
                 }
             }
             DefaultLineTracker lineTracker=new DefaultLineTracker();
+            String content=EMPTY;
             if (iFile != null) {
                 InputStream stream=null;
                 try {
                     stream=iFile.getContents();
-                    String content=IOUtils.toString(stream);
-                    lineTracker.set(content);
-                    is=createInputStream();
-                    if (is != null) {
-                        List<String> lines=IOUtils.readLines(is);
-                        IOUtils.closeQuietly(is);
-
-                        StringBuffer buf=new StringBuffer();
-                        for (int i=0; i < lineTracker.getNumberOfLines(); i++) {
-                            IRegion region=lineTracker.getLineInformation(i);
-                            String lineDelimiter=lineTracker.getLineDelimiter(i);
-                            String actualLine=content.substring(region.getOffset(), region.getOffset() + region.getLength());
-                            boolean found=false;
-                            for (String line : lines) {
-                                if (equals(actualLine, line)) {
-                                    lines.remove(line);
-                                    buf.append(line).append(lineDelimiter);
-                                    found=true;
-                                    break;
-                                }
-                            }
-                            if (!found) {
-                                buf.append(actualLine);
-                                if (lineDelimiter != null)
-                                    buf.append(lineDelimiter);
-                            }
-                        }
-                        for (String line : lines) {
-                            if (!line.trim().startsWith("#")) //$NON-NLS-1$
-                                buf.append(line).append(System.getProperty(Platform.PREF_LINE_SEPARATOR));
-                        }
-                        return createStorage(buf.toString());
-                    }
+                    content=IOUtils.toString(stream);
                 } finally {
                     IOUtils.closeQuietly(stream);
                 }
             }
+            lineTracker.set(content);
+            is=createInputStream();
+            if (is != null) {
+                List<String> lines=IOUtils.readLines(is);
+                IOUtils.closeQuietly(is);
+
+                StringBuffer buf=new StringBuffer();
+                for (int i=0; i < lineTracker.getNumberOfLines(); i++) {
+                    IRegion region=lineTracker.getLineInformation(i);
+                    String lineDelimiter=lineTracker.getLineDelimiter(i);
+                    String actualLine=content.substring(region.getOffset(), region.getOffset() + region.getLength());
+                    boolean found=false;
+                    for (String line : lines) {
+                        if (equals(actualLine, line)) {
+                            lines.remove(line);
+                            buf.append(line).append(lineDelimiter);
+                            found=true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        buf.append(actualLine);
+                        if (lineDelimiter != null)
+                            buf.append(lineDelimiter);
+                    }
+                }
+                for (String line : lines) {
+                    if (!line.trim().startsWith("#")) //$NON-NLS-1$
+                        buf.append(line).append(System.getProperty(Platform.PREF_LINE_SEPARATOR));
+                }
+                return createStorage(buf.toString());
+            }
+            // }
         } catch (Exception e) {
             Activator.logError("Failed fetching member", e); //$NON-NLS-1$
             ByteArrayOutputStream baos=new ByteArrayOutputStream();

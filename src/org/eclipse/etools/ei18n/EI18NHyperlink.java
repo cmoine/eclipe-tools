@@ -32,7 +32,7 @@ public class EI18NHyperlink implements IHyperlink {
     }
 
     public String getHyperlinkText() {
-        return "Open in EI18N";
+        return "Open With EI18N";
     }
 
     public void open() {

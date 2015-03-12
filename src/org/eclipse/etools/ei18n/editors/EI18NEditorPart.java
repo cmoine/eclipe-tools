@@ -62,7 +62,9 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -122,7 +124,8 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
         // ADD the main page
         Composite composite=new Composite(getContainer(), SWT.NONE);
-        composite.setLayout(new GridLayout());
+        GridLayout gLayout=new GridLayout(3, false);
+        composite.setLayout(gLayout);
 
         link=new Link(composite, SWT.NONE);
         link.addSelectionListener(new SelectionAdapter() {
@@ -164,6 +167,8 @@ public class EI18NEditorPart extends MultiPageEditorPart
             }
         });
         link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        new Label(composite, SWT.NONE).setText("Encoding: ");
+        new Combo(composite, SWT.READ_ONLY);
 
         ei18nComposite=new EI18NComposite(composite) {
 
@@ -188,7 +193,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
                 }
             }
         };
-        ei18nComposite.getViewer().getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        ei18nComposite.getViewer().getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, gLayout.numColumns, 1));
         int mainPageIndex=addPage(composite);
         setPageText(mainPageIndex, EI18N);
         setPageImage(mainPageIndex, EI18NImage.LOGO_16.getImage());

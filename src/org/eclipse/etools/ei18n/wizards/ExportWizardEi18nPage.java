@@ -27,7 +27,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.util.BidiUtils;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -174,7 +173,7 @@ public class ExportWizardEi18nPage extends WizardDataTransferPage {
             data.widthHint=SIZING_TEXT_FIELD_WIDTH;
             destinationNameField.setLayoutData(data);
             //        destinationNameField.setFont(font);
-            BidiUtils.applyBidiProcessing(destinationNameField, FILE);
+            // BidiUtils.applyBidiProcessing(destinationNameField, FILE);
 
             destinationBrowseButton=new Button(composite, SWT.PUSH);
             destinationBrowseButton.setText(DataTransferMessages.DataTransfer_browse);

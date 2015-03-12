@@ -40,10 +40,14 @@ public class XLSSubscriber extends AbstractSubscriber {
                 rows.add(sheet.getRow(i));
             }
             HSSFRow firstRow=sheet.getRow(0);
-            for (int col=0; col < firstRow.getPhysicalNumberOfCells(); col++) {
-            	if(firstRow.getCell(col) == null){
-                    Activator.logError("Impossible de trouver la colonne => " + col, null); //$NON-NLS-1$
-            		continue;
+            for (int col=0;; col++) {
+                if (firstRow.getCell(col) == null) {
+                    if (translations.isEmpty()) {
+                        Activator.logError("Impossible de trouver la colonne => " + col, null); //$NON-NLS-1$
+                        continue;
+                    } else {
+                        break;
+                    }
             	}
                 String cellValue=firstRow.getCell(col).getStringCellValue();
                 if (StringUtils.equalsIgnoreCase(cellValue, "key")) { //$NON-NLS-1$

@@ -43,7 +43,7 @@ public class XLSResourceVariant extends AbstractResourceVariant {
             if (cell != null && cell.getStringCellValue().startsWith(prefix)) {
                 String key=StringUtils.substringAfter(cell.getStringCellValue(), "#"); //$NON-NLS-1$
                 Cell cell2=row.getCell(localeIndex);
-                props.setProperty(key, cell2 == null ? StringUtils.EMPTY : StringUtils.defaultString(cell2.getStringCellValue()));
+                props.setProperty(key, cell2 == null ? StringUtils.EMPTY : StringUtils.defaultString(getValue(cell2)));
             }
         }
         // Write
@@ -57,6 +57,22 @@ public class XLSResourceVariant extends AbstractResourceVariant {
             }
         }
         return new ByteArrayInputStream(buf.toString().getBytes());
+    }
+
+    private String getValue(Cell cell) {
+        switch (cell.getCellType()) {
+            case Cell.CELL_TYPE_NUMERIC:
+                String string=Double.toString(cell.getNumericCellValue());
+                //                Assert.isTrue(string.endsWith(".0"), "Must not be decimal"); //$NON-NLS-1$ //$NON-NLS-2$
+                string=StringUtils.removeEnd(string, ".0"); //$NON-NLS-1$
+                return string;
+            case Cell.CELL_TYPE_STRING:
+                return cell.getStringCellValue();
+            case Cell.CELL_TYPE_BLANK:
+            default:
+                return null;
+                // return cell.getRawValue();
+        }
     }
 
     @Override
