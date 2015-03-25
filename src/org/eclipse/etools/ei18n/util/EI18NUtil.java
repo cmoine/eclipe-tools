@@ -17,11 +17,12 @@ public class EI18NUtil {
         try {
             while ((res=element.getCorrespondingResource()) == null)
                 element=element.getParent();
-            return (IFile) res;
+            if (res instanceof IFile)
+                return (IFile) res;
         } catch (JavaModelException e) {
             Activator.logError("Failed finding corresponding resource", e); //$NON-NLS-1$
-            return null;
         }
+        return null;
     }
 
     public static IFile getDefaultFile(IFile file) {

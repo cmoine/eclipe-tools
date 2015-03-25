@@ -18,9 +18,11 @@ public class EI18NHyperlinkDetector extends JavaElementHyperlinkDetector {
             boolean qualify, JavaEditor editor) {
         // String key=element.getElementName();
         IFile javaFile=EI18NUtil.getFile(element);
-        for (MappingPreference pref : MappingPreference.list(javaFile.getProject())) {
-            if (pref.getJavaFile().equals(javaFile)) {
-                hyperlinksCollector.add(new EI18NHyperlink(wordRegion, openAction, element, qualify));
+        if (javaFile != null) {
+            for (MappingPreference pref : MappingPreference.list(javaFile.getProject())) {
+                if (pref.getJavaFile().equals(javaFile)) {
+                    hyperlinksCollector.add(new EI18NHyperlink(wordRegion, openAction, element, qualify));
+                }
             }
         }
     }
