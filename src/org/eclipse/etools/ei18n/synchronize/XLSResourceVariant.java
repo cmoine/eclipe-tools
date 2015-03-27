@@ -43,7 +43,9 @@ public class XLSResourceVariant extends AbstractResourceVariant {
             if (cell != null && cell.getStringCellValue().startsWith(prefix)) {
                 String key=StringUtils.substringAfter(cell.getStringCellValue(), "#"); //$NON-NLS-1$
                 Cell cell2=row.getCell(localeIndex);
-                props.setProperty(key, cell2 == null ? StringUtils.EMPTY : StringUtils.defaultString(getValue(cell2)));
+                String value=cell2 == null ? StringUtils.EMPTY : StringUtils.defaultString(getValue(cell2));
+                if (StringUtils.isNotBlank(key))
+                    props.setProperty(key, value);
             }
         }
         // Write

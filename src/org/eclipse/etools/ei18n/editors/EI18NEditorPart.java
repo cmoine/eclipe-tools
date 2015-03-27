@@ -4,6 +4,7 @@ import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ import javax.lang.model.SourceVersion;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.NullInputStream;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IContainer;
@@ -25,7 +28,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.etools.Activator;
-import org.eclipse.etools.ei18n.EI18NComposite;
 import org.eclipse.etools.ei18n.EI18NImage;
 import org.eclipse.etools.ei18n.dialogs.JavaFileSelectionDialog;
 import org.eclipse.etools.ei18n.extensions.IJavaMapping;
@@ -35,11 +37,15 @@ import org.eclipse.etools.ei18n.util.EI18NConstants;
 import org.eclipse.etools.ei18n.util.FontUtil;
 import org.eclipse.etools.ei18n.util.LineProperties;
 import org.eclipse.etools.ei18n.util.MappingPreference;
+import org.eclipse.etools.ei18n.util.TranslationCellEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.jdt.internal.ui.propertiesfileeditor.PropertiesFileEditor;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellEditorListener;
 import org.eclipse.jface.viewers.ICellEditorValidator;
@@ -48,8 +54,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ltk.core.refactoring.DocumentChange;
 import org.eclipse.swt.SWT;
@@ -64,12 +73,15 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -78,6 +90,8 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.internal.WorkbenchPlugin;
 import org.eclipse.ui.part.FileEditorInput;
@@ -93,9 +107,31 @@ public class EI18NEditorPart extends MultiPageEditorPart
 {
     public static final String ID=EI18NEditorPart.class.getName();
 
+    public static final String KEY_COLUMN_PROPERTY="key"; //$NON-NLS-1$
+    public static final String ADD_COLUMN_PROPERTY="add"; //$NON-NLS-1$
     private static final String EI18N="EI18N"; //$NON-NLS-1$
-    private EI18NComposite ei18nComposite;
+    //    private EI18NComposite ei18nComposite;
     private int oldPageIndex=-1;
+
+    private FilteredTree viewer;
+
+    private static class MyContentProvider extends ArrayContentProvider implements ITreeContentProvider {
+        public static final MyContentProvider INSTANCE=new MyContentProvider();
+
+        public Object[] getChildren(Object parentElement) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public Object getParent(Object element) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public boolean hasChildren(Object element) {
+            return false;
+        }
+    }
 
     private static class Information {
         public Information(IFile file, LineProperties lineProps, TextEditor editor, IDocument doc) {
@@ -108,6 +144,89 @@ public class EI18NEditorPart extends MultiPageEditorPart
         private final LineProperties properties;
         private final IDocument doc;
         private final TextEditor editor;
+    }
+
+    private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider, ITableFontProvider {
+        private Font boldFont;
+        private Font italicFont;
+
+        @Override
+        public String getText(Object element) {
+            StringBuffer buf=new StringBuffer();
+            for (int i=0; i < getNbLocales(); i++) {
+                if (buf.length() > 0)
+                    buf.append('|');
+
+                buf.append(getColumnText(element, i));
+            }
+            return buf.toString();
+        }
+
+        public String getColumnText(Object obj, int index) {
+            Line str=(Line) obj;
+            if (str.isNew())
+                return index > 0 ? StringUtils.EMPTY : "New"; //$NON-NLS-1$
+            if (index == 0)
+                return str.getString();
+            else {
+                String locale=getLocale(index);
+                if (locale != null) {
+                    Information info=infos.get(locale);
+                    if (info != null)
+                        return info.properties.getProperty(str.getString()); // TODO
+                }
+            }
+
+            return null;
+        }
+
+        public Image getColumnImage(Object element, int index) {
+            String locale=getLocale(index);
+            if (locale != null && !((Line) element).isNew() && StringUtils.isEmpty(getColumnText(element, index)))
+                return EI18NImage.ERROR_16.getImage();
+
+            return null;
+        }
+
+        public Color getForeground(Object element, int columnIndex) {
+            if (((Line) element).isNew())
+                return getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);
+
+            return null;
+        }
+
+        public Color getBackground(Object element, int columnIndex) {
+            return null;
+        }
+
+        public Font getFont(Object element, int columnIndex) {
+            if (((Line) element).isNew())
+                return italicFont();
+            if (newKeys.contains(element))
+                return boldFont();
+
+            return null;
+        }
+
+        private Font italicFont() {
+            if (italicFont == null)
+                italicFont=FontUtil.derivate(viewer.getViewer().getControl().getFont(), SWT.ITALIC);
+
+            return italicFont;
+        }
+
+        private Font boldFont() {
+            if (boldFont == null)
+                boldFont=FontUtil.derivate(viewer.getViewer().getControl().getFont(), SWT.BOLD);
+
+            return boldFont;
+        }
+
+        @Override
+        public void dispose() {
+            super.dispose();
+            FontUtil.safeDispose(boldFont, italicFont);
+        }
     }
 
     private final Map<String, Information> infos=Maps.newHashMap();
@@ -170,30 +289,38 @@ public class EI18NEditorPart extends MultiPageEditorPart
         new Label(composite, SWT.NONE).setText("Encoding: ");
         new Combo(composite, SWT.READ_ONLY);
 
-        ei18nComposite=new EI18NComposite(composite) {
+        viewer=new FilteredTree(composite, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL, new PatternFilter(), true);
+        viewer.getViewer().setContentProvider(MyContentProvider.INSTANCE);
+        Tree table=viewer.getViewer().getTree();
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
+        createColumn(500, "Key"); //$NON-NLS-1$
+        createColumn(200, "Default Traduction").setImage(EI18NImage.LOGO_16.getImage()); //$NON-NLS-1$
 
-            @Override
-            protected void createLocale(String locale) {
-                // TODO CME
-                IFile newFile=propertyFile.getParent().getFile(new Path("messages_" + locale + ".properties")); //$NON-NLS-1$//$NON-NLS-2$
-                try {
-                    newFile.create(new NullInputStream(0L), false, new NullProgressMonitor());
-                    loadPropertyTab(locale, newFile);
-                    // TODO CME
-                    //                    locales.add(value);
-                    //                    setLocales(locales);
-
-                    //                    for (Line key : getKeys()) {
-                    //                    ei18nComposite.getViewer().refresh();//update(key, columns);
-                    //                    }
-
-                    //                    refreshColumns(locale);
-                } catch (CoreException e) {
-                    Activator.logError("Failed creating file " + newFile, e); //$NON-NLS-1$
-                }
-            }
-        };
-        ei18nComposite.getViewer().getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, gLayout.numColumns, 1));
+        //        ei18nComposite=new EI18NComposite(composite) {
+        //
+        //            @Override
+        //            protected void createLocale(String locale) {
+        //                // TODO CME
+        //                IFile newFile=propertyFile.getParent().getFile(new Path("messages_" + locale + ".properties")); //$NON-NLS-1$//$NON-NLS-2$
+        //                try {
+        //                    newFile.create(new NullInputStream(0L), false, new NullProgressMonitor());
+        //                    loadPropertyTab(locale, newFile);
+        //                    // TODO CME
+        //                    //                    locales.add(value);
+        //                    //                    setLocales(locales);
+        //
+        //                    //                    for (Line key : getKeys()) {
+        //                    //                    ei18nComposite.getViewer().refresh();//update(key, columns);
+        //                    //                    }
+        //
+        //                    //                    refreshColumns(locale);
+        //                } catch (CoreException e) {
+        //                    Activator.logError("Failed creating file " + newFile, e); //$NON-NLS-1$
+        //                }
+        //            }
+        //        };
+        viewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, gLayout.numColumns, 1));
         int mainPageIndex=addPage(composite);
         setPageText(mainPageIndex, EI18N);
         setPageImage(mainPageIndex, EI18NImage.LOGO_16.getImage());
@@ -219,105 +346,29 @@ public class EI18NEditorPart extends MultiPageEditorPart
                     loadPropertyTab(matcher.group(1), (IFile) res);
                 }
             }
-            ei18nComposite.setLocales(infos.keySet());
+            setLocales(infos.keySet());
         } catch (CoreException e1) {
             Activator.logError("Failed loading locales", e1); //$NON-NLS-1$
         }
 
-        class ViewLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider, ITableFontProvider {
-            private Font boldFont;
-            private Font italicFont;
-
-            public String getColumnText(Object obj, int index) {
-                Line str=(Line) obj;
-                if (str.isNew())
-                    return index > 0 ? StringUtils.EMPTY : "New"; //$NON-NLS-1$
-                if (index == 0)
-                    return str.getString();
-                else {// if (index - 1 < props.size())
-                    String locale=ei18nComposite.getLocale(index);
-                    if (locale != null) {
-                        Information info=infos.get(locale);
-                        if (info != null)
-                            return info.properties.getProperty(str.getString()); // TODO
-                    }
-                }
-
-                return null;
-            }
-
-            //            private String getColumnProperty(int index) {
-            //                //                if(index<)
-            //                Object[] properties=ei18nComposite.getViewer().getColumnProperties();
-            //                return index < properties.length ? (String) properties[index] : null;
-            //            }
-
-            public Image getColumnImage(Object element, int index) {
-                String locale=ei18nComposite.getLocale(index);
-                if (locale != null && !((Line) element).isNew() && StringUtils.isEmpty(getColumnText(element, index)))
-                    return EI18NImage.ERROR_16.getImage();
-
-                return null;
-            }
-
-            public Color getForeground(Object element, int columnIndex) {
-                if (((Line) element).isNew())
-                    return getSite().getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);
-
-                return null;
-            }
-
-            public Color getBackground(Object element, int columnIndex) {
-                return null;
-            }
-
-            public Font getFont(Object element, int columnIndex) {
-                if (((Line) element).isNew())
-                    return italicFont();
-                if (newKeys.contains(element))
-                    return boldFont();
-
-                return null;
-            }
-
-            private Font italicFont() {
-                if (italicFont == null)
-                    italicFont=FontUtil.derivate(ei18nComposite.getViewer().getControl().getFont(), SWT.ITALIC);
-
-                return italicFont;
-            }
-
-            private Font boldFont() {
-                if (boldFont == null)
-                    boldFont=FontUtil.derivate(ei18nComposite.getViewer().getControl().getFont(), SWT.BOLD);
-
-                return boldFont;
-            }
-
-            @Override
-            public void dispose() {
-                super.dispose();
-                FontUtil.safeDispose(boldFont, italicFont);
-            }
-        }
-        ei18nComposite.getViewer().setLabelProvider(new ViewLabelProvider());
-        ei18nComposite.getViewer().setCellModifier(new ICellModifier() {
+        viewer.getViewer().setLabelProvider(new ViewLabelProvider());
+        viewer.getViewer().setCellModifier(new ICellModifier() {
             public void modify(Object element, String property, Object value) {
                 try {
-                    Line line=(Line) ((TableItem) element).getData();
+                    Line line=(Line) ((TreeItem) element).getData();
                     String key=line.getString();
                     List<DocumentChange> changes=Lists.newArrayList();
-                    if (property.equals(EI18NComposite.KEY_COLUMN_PROPERTY)) {
+                    if (property.equals(KEY_COLUMN_PROPERTY)) {
                         // Key edition
                         String newKey=(String) value;
                         line.setString(newKey);//Length(0);
                         //                        keyBuffer.append(newKey);
-                        if (!containsKey(StringUtils.EMPTY)) {
+                        if (!hasNew()) {
                             // Re add new item
                             //                            StringBuffer newItem=new StringBuffer();
                             Line newItem=new Line();
                             getKeys().add(newItem);
-                            ei18nComposite.getViewer().add(ei18nComposite.getViewer().getInput(), newItem);
+                            viewer.getViewer().add(viewer.getViewer().getInput(), newItem);
                         }
 
                         // Change in .properties file
@@ -388,7 +439,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
                         //                        if (lineProperties != null)
                         //                            lineProperties.reload(document.get());
                     }
-                    ei18nComposite.getViewer().update(line, new String[] { property });
+                    viewer.getViewer().update(line, new String[] { property });
                     firePropertyChange(PROP_DIRTY);
                 } catch (Exception e) {
                     Activator.logError("Failed to modify source code", e); //$NON-NLS-1$
@@ -400,22 +451,22 @@ public class EI18NEditorPart extends MultiPageEditorPart
             }
 
             public Object getValue(Object element, String property) {
-                //                if (property == EI18NComposite.KEY_COLUMN_PROPERTY)
-                //                    return ((Line) element).toString();
+                if (property == KEY_COLUMN_PROPERTY)
+                    return ((Line) element).getString();
 
                 Line key=(Line) element;
                 if (key.isNew())
                     return StringUtils.EMPTY;
 
                 Map<String, String> map=Maps.newHashMap();
-                for (int i=0; i < ei18nComposite.getViewer().getColumnProperties().length; i++) {
-                    String locale=ei18nComposite.getLocale(i);
+                for (int i=0; i < viewer.getViewer().getColumnProperties().length; i++) {
+                    String locale=getLocale(i);
                     if (locale != null) {
                         map.put(locale, StringUtils.defaultString(infos.get(locale).properties.getProperty(key.getString())));
                     }
                 }
 
-                return new EditionLine(property, StringUtils.defaultString(infos.get(property).properties.getProperty(key.getString())), map);
+                return new EditionLine(property, StringUtils.defaultString(infos.get(EMPTY/*property*/).properties.getProperty(key.getString())), map);
             }
 
             //            private LineProperties get(String property) {
@@ -448,13 +499,14 @@ public class EI18NEditorPart extends MultiPageEditorPart
         //                return buf.length() == 0 ? 1 : 0;
         //            }
         //        });
-        final CellEditor cellEditor=ei18nComposite.getViewer().getCellEditors()[0];
+        final CellEditor cellEditor=viewer.getViewer().getCellEditors()[0];
         cellEditor.setValidator(new ICellEditorValidator() {
             public String isValid(Object value) {
-                if (!SourceVersion.isName((String) value))
+                String line=(String) value;
+                if (!SourceVersion.isName(line))
                     return "Not a valid Java identifier"; //$NON-NLS-1$
 
-                return containsKey((String) value) ? "Key already exists" : null; //$NON-NLS-1$
+                return containsKey(line) ? "Key already exists" : null; //$NON-NLS-1$
             }
         });
         cellEditor.addListener(new ICellEditorListener() {
@@ -477,7 +529,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
         });
 
         // ADD delete entry
-        Menu menu=new Menu(ei18nComposite.getViewer().getControl());
+        Menu menu=new Menu(viewer.getViewer().getControl());
         final MenuItem deleteItem=new MenuItem(menu, SWT.NONE);
         deleteItem.setText("Delete");
         deleteItem.setImage(EI18NImage.DELETE_16.getImage());
@@ -485,21 +537,25 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                Line buf=(Line) ((IStructuredSelection) ei18nComposite.getViewer().getSelection()).getFirstElement();
+                Line buf=(Line) ((IStructuredSelection) viewer.getViewer().getSelection()).getFirstElement();
                 deleteItem(buf);
             }
         });
-        ei18nComposite.getViewer().getControl().addMenuDetectListener(new MenuDetectListener() {
+        viewer.getViewer().getControl().addMenuDetectListener(new MenuDetectListener() {
 
             public void menuDetected(MenuDetectEvent e) {
                 deleteItem.setEnabled(false);
-                if (e.y >= ei18nComposite.getViewer().getTree().getHeaderHeight()) {
-                    Line selection=(Line) ((IStructuredSelection) ei18nComposite.getViewer().getSelection()).getFirstElement();
+                if (e.y >= viewer.getViewer().getTree().getHeaderHeight()) {
+                    Line selection=(Line) ((IStructuredSelection) viewer.getViewer().getSelection()).getFirstElement();
                     deleteItem.setEnabled(selection != null && !selection.isNew());
                 }
             }
         });
-        ei18nComposite.getViewer().getControl().setMenu(menu);
+        viewer.getViewer().getControl().setMenu(menu);
+    }
+
+    public int getNbLocales() {
+        return viewer.getViewer().getColumnProperties().length;
     }
 
     private void updateInput() {
@@ -511,7 +567,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
             }
         }
         input.add(new Line());
-        ei18nComposite.setInput(input);
+        viewer.getViewer().setInput(input);
         updateJavaContent();
     }
 
@@ -615,7 +671,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     private Set<Line> getKeys() {
-        return (Set<Line>) ei18nComposite.getViewer().getInput();
+        return (Set<Line>) viewer.getViewer().getInput();
     }
 
     @Override
@@ -700,7 +756,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
     private String getKeySelected() {
         if (oldPageIndex == 0) {
-            Line buffer=(Line) ((IStructuredSelection) ei18nComposite.getViewer().getSelection()).getFirstElement();
+            Line buffer=(Line) ((IStructuredSelection) viewer.getViewer().getSelection()).getFirstElement();
             //            if (buffer != null)
             //                return buffer.toString();
             // TODO CME
@@ -799,6 +855,15 @@ public class EI18NEditorPart extends MultiPageEditorPart
         return false;
     }
 
+    protected boolean hasNew() {
+        for (Line line : getKeys()) {
+            if (line.getString() == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected boolean containsKey(String str) {
         for (Line line : getKeys()) {
             if (line.getString() != null && line.getString().equalsIgnoreCase(str)) {
@@ -812,7 +877,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
         if (StringUtils.isNotEmpty(key)) {
             for (Line buf : getKeys()) {
                 if (buf.getString().equals(key)) {
-                    ei18nComposite.getViewer().setSelection(new StructuredSelection(buf), true);
+                    viewer.getViewer().setSelection(new StructuredSelection(buf), true);
                     //                    ei18nComposite.getViewer().reveal(buf);
                 }
             }
@@ -853,7 +918,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
         //            Activator.log(ERROR, "Failed to delete source code in " + javaFile, e1); //$NON-NLS-1$
         //        }
         // Remove from viewer
-        ei18nComposite.getViewer().remove(line);
+        viewer.getViewer().remove(line);
         firePropertyChange(PROP_DIRTY);
     }
 
@@ -863,5 +928,145 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
     private Shell getShell() {
         return getSite().getShell();
+    }
+
+    @Override
+    public void setFocus() {
+        viewer.getViewer().getControl().setFocus();
+    }
+
+    protected TreeColumn createColumn(int width, String text) {
+        TreeColumn column=new TreeColumn(viewer.getViewer().getTree(), SWT.NONE);
+        column.setWidth(width);
+        column.setText(text);
+        return column;
+    }
+
+    public void setInput(Set<Line> input) {
+        viewer.getViewer().setInput(input);
+    }
+
+    public void setLocales(Collection<String> locales) {
+        createLocaleColumn(locales);
+        addAddColumn();
+    }
+
+    protected void addAddColumn() {
+        final TreeColumn addColumn=new TreeColumn(viewer.getViewer().getTree(), SWT.NONE);
+        addColumn.setWidth(30);
+        addColumn.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                InputDialog dialog=new InputDialog(getShell(), StringUtils.EMPTY, "Please enter a new locale", null, new IInputValidator() { //$NON-NLS-1$
+                            public String isValid(String newText) {
+                                try {
+                                    LocaleUtils.toLocale(newText);
+                                    return null;
+                                } catch (IllegalArgumentException e) {
+                                    return "Please enter a valid locale (ie.: fr)"; //$NON-NLS-1$
+                                }
+                            }
+                        });
+                if (dialog.open() == Window.OK) {
+                    String locale=dialog.getValue();
+                    addColumn.setWidth(100);
+                    addColumn.setImage(EI18NImage.getImage(LocaleUtils.toLocale(locale)));
+                    createLocale(locale);
+                    addColumn.setText(locale);
+                    viewer.getViewer().setCellEditors(ArrayUtils.add(viewer.getViewer().getCellEditors(), createLocaleEditor(locale)));
+                    String[] properties=(String[]) viewer.getViewer().getColumnProperties();
+                    viewer.getViewer().setColumnProperties(ArrayUtils.add(properties, properties.length - 1, locale));
+                    addAddColumn();
+                    viewer.getViewer().refresh();
+                }
+            }
+        });
+        addColumn.setImage(EI18NImage.ADD_16.getImage());
+    }
+
+    //    protected void createLocale(String locale) {
+    //    }
+
+    public TreeViewer getViewer() {
+        return viewer.getViewer();
+    }
+
+    public Control getControl() {
+        return viewer;
+    }
+
+    private CellEditor createLocaleEditor(String locale) {
+        return new TranslationCellEditor(viewer.getViewer().getTree(), locale) {
+            private EditionLine line;
+
+            @Override
+            protected Map<String, String> getStringsToTranslate() {
+                //                String[] columnProperties=(String[]) viewer.getColumnProperties();
+                //                Map<String, String> result=Maps.newHashMapWithExpectedSize(columnProperties.length - 2);
+                //                for (int i=1; i < columnProperties.length - 1; i++) {
+                //                    result.put(columnProperties[i], get);
+                //                }
+                return line.getMap();
+            }
+
+            @Override
+            protected void updateContents(Object value) {
+                if (value instanceof EditionLine) {
+                    line=(EditionLine) value;
+                    super.updateContents(line.getValue());
+                } else
+                    super.updateContents(value);
+            }
+        };
+    }
+
+    protected void createLocaleColumn(Collection<String> locales) {
+        List<String> columnProps=Lists.newArrayList();
+        columnProps.add(KEY_COLUMN_PROPERTY);
+        columnProps.add(EMPTY);
+        List<CellEditor> editors=Lists.newArrayList();
+        CellEditor cellEditor=new TextCellEditor(viewer.getViewer().getTree());
+        editors.add(cellEditor);
+        cellEditor=createLocaleEditor(EMPTY);
+        editors.add(cellEditor);
+        for (String locale : locales) {
+            if (!locale.isEmpty()) {
+                TreeColumn column=createColumn(100, locale);
+                column.setImage(EI18NImage.getImage(LocaleUtils.toLocale(locale)));
+                //                column.setData(locale);
+                columnProps.add(locale);
+                editors.add(createLocaleEditor(locale));
+            }
+        }
+        columnProps.add(ADD_COLUMN_PROPERTY);
+        viewer.getViewer().setColumnProperties(columnProps.toArray(new String[] {}));
+        viewer.getViewer().setCellEditors(editors.toArray(new CellEditor[] {}));
+    }
+
+    public String getLocale(int columnIndex) {
+        String columnProperty=(String) viewer.getViewer().getColumnProperties()[columnIndex];
+        if (ADD_COLUMN_PROPERTY.equals(columnProperty) || KEY_COLUMN_PROPERTY.equals(columnProperty))
+            return null;
+        return columnProperty;
+    }
+
+    protected void createLocale(String locale) {
+        // TODO CME
+        IFile newFile=propertyFile.getParent().getFile(new Path("messages_" + locale + ".properties")); //$NON-NLS-1$//$NON-NLS-2$
+        try {
+            newFile.create(new NullInputStream(0L), false, new NullProgressMonitor());
+            loadPropertyTab(locale, newFile);
+            // TODO CME
+            //                    locales.add(value);
+            //                    setLocales(locales);
+
+            //                    for (Line key : getKeys()) {
+            //                    ei18nComposite.getViewer().refresh();//update(key, columns);
+            //                    }
+
+            //                    refreshColumns(locale);
+        } catch (CoreException e) {
+            Activator.logError("Failed creating file " + newFile, e); //$NON-NLS-1$
+        }
     }
 }

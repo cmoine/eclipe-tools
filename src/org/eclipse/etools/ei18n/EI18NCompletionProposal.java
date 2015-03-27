@@ -158,6 +158,8 @@ public class EI18NCompletionProposal extends AbstractJavaCompletionProposal {
                 IJavaProject javaProject=callerCU.getJavaProject();
                 String[] initialValue=StubUtility.getVariableNameSuggestions(NamingConventions.VK_STATIC_FINAL_FIELD, javaProject, getStringLiteral(), 0,
                         excluded, true);
+                if (initialValue.length == 0)
+                    initialValue=StubUtility.getVariableNameSuggestions(NamingConventions.VK_STATIC_FINAL_FIELD, javaProject, "string", 0, excluded, true);
                 String fieldName=initialValue[0];
 
                 String lineDelimiter=StubUtility.getLineDelimiterUsed(javaProject);

@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.record.CFRuleRecord.ComparisonOperator;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFConditionalFormattingRule;
@@ -171,16 +172,18 @@ public class ExcelImpex implements IImpex {
                     }
                 }
                 for (String key : Iterables.filter(Collections.list(props.keys()), String.class)) {
-                    HSSFRow row=sheet.createRow(rownum++);
-                    int col=STARTING_COLUMN;
-                    row.createCell(col++).setCellValue(line.mainFile.getFullPath().toString() + "#" + key); //$NON-NLS-1$
-                    row.createCell(col++).setCellValue((String) props.get(key));
-                    for (Properties localeProps : propsList) {
-                        HSSFCell cell2=row.createCell(col++);
-                        cell2.setCellValue((String) localeProps.get(key));
+                    if (StringUtils.isNotBlank(key)) {
+                        HSSFRow row=sheet.createRow(rownum++);
+                        int col=STARTING_COLUMN;
+                        row.createCell(col++).setCellValue(line.mainFile.getFullPath().toString() + "#" + key); //$NON-NLS-1$
+                        row.createCell(col++).setCellValue((String) props.get(key));
+                        for (Properties localeProps : propsList) {
+                            HSSFCell cell2=row.createCell(col++);
+                            cell2.setCellValue((String) localeProps.get(key));
+                        }
+                        if (col > maxCols)
+                            maxCols=col;
                     }
-                    if (col > maxCols)
-                        maxCols=col;
                 }
             }
             createEmptyFormattingRule(
