@@ -193,7 +193,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
                 }
             }
         };
-        ei18nComposite.getViewer().getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, gLayout.numColumns, 1));
+        ei18nComposite.getViewer().getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, gLayout.numColumns, 1));
         int mainPageIndex=addPage(composite);
         setPageText(mainPageIndex, EI18N);
         setPageImage(mainPageIndex, EI18NImage.LOGO_16.getImage());
@@ -317,7 +317,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
                             //                            StringBuffer newItem=new StringBuffer();
                             Line newItem=new Line();
                             getKeys().add(newItem);
-                            ei18nComposite.getViewer().add(newItem);
+                            ei18nComposite.getViewer().add(ei18nComposite.getViewer().getInput(), newItem);
                         }
 
                         // Change in .properties file
@@ -493,7 +493,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
             public void menuDetected(MenuDetectEvent e) {
                 deleteItem.setEnabled(false);
-                if (e.y >= ei18nComposite.getViewer().getTable().getHeaderHeight()) {
+                if (e.y >= ei18nComposite.getViewer().getTree().getHeaderHeight()) {
                     Line selection=(Line) ((IStructuredSelection) ei18nComposite.getViewer().getSelection()).getFirstElement();
                     deleteItem.setEnabled(selection != null && !selection.isNew());
                 }

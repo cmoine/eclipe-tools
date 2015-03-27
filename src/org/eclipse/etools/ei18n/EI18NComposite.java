@@ -17,32 +17,31 @@ import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PatternFilter;
 
 import com.google.common.collect.Lists;
 
 public class EI18NComposite {
     public static final String KEY_COLUMN_PROPERTY="key"; //$NON-NLS-1$
     public static final String ADD_COLUMN_PROPERTY="add"; //$NON-NLS-1$
-    //    public static final String DEFAULT_COLUMN_PROPERTY="default"; //$NON-NLS-1$
 
-    private final TableViewer viewer;
-
-    //    private TreeSet<String> locales;
+    private final FilteredTree viewer;
 
     public EI18NComposite(Composite parent) {
-        viewer=new TableViewer(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        viewer.setContentProvider(ArrayContentProvider.getInstance());
-        Table table=viewer.getTable();
+        viewer=new FilteredTree(parent, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL, new PatternFilter(), true);
+        viewer.getViewer().setContentProvider(ArrayContentProvider.getInstance());
+        Tree table=viewer.getViewer().getTree();
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
         createColumn(500, "Key"); //$NON-NLS-1$
@@ -50,23 +49,18 @@ public class EI18NComposite {
     }
 
     public void setFocus() {
-        viewer.getControl().setFocus();
+        viewer.getViewer().getControl().setFocus();
     }
 
-    protected TableColumn createColumn(int width, String text) {
-        TableColumn column=new TableColumn(viewer.getTable(), SWT.NONE);
+    protected TreeColumn createColumn(int width, String text) {
+        TreeColumn column=new TreeColumn(viewer.getViewer().getTree(), SWT.NONE);
         column.setWidth(width);
         column.setText(text);
         return column;
     }
 
-    public void setInput(/* Collection<String> locales, */Set<Line> input) {
-        //        TreeSet<String> locales=Sets.newTreeSet();
-        //        for (Line line : input) {
-        //            locales.addAll(line.getLocales());
-        //        }
-
-        viewer.setInput(input);
+    public void setInput(Set<Line> input) {
+        viewer.getViewer().setInput(input);
     }
 
     public void setLocales(Collection<String> locales) {
@@ -74,18 +68,8 @@ public class EI18NComposite {
         addAddColumn();
     }
 
-    //    public List<String> getLocales() {
-    //        TableColumn[] columns=viewer.getTable().getColumns();
-    //        int length=columns.length;
-    //        List<String> locales=new ArrayList<String>(length - 2);
-    //        for (int i=2; i < length; i++) {
-    //            locales.add((String) columns[i].getData());
-    //        }
-    //        return locales;
-    //    }
-
     protected void addAddColumn() {
-        final TableColumn addColumn=new TableColumn(viewer.getTable(), SWT.NONE);
+        final TreeColumn addColumn=new TreeColumn(viewer.getViewer().getTree(), SWT.NONE);
         addColumn.setWidth(30);
         addColumn.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -106,11 +90,11 @@ public class EI18NComposite {
                     addColumn.setImage(EI18NImage.getImage(LocaleUtils.toLocale(locale)));
                     createLocale(locale);
                     addColumn.setText(locale);
-                    viewer.setCellEditors(ArrayUtils.add(viewer.getCellEditors(), createLocaleEditor(locale)));
-                    String[] properties=(String[]) viewer.getColumnProperties();
-                    viewer.setColumnProperties(ArrayUtils.add(properties, properties.length - 1, locale));
+                    viewer.getViewer().setCellEditors(ArrayUtils.add(viewer.getViewer().getCellEditors(), createLocaleEditor(locale)));
+                    String[] properties=(String[]) viewer.getViewer().getColumnProperties();
+                    viewer.getViewer().setColumnProperties(ArrayUtils.add(properties, properties.length - 1, locale));
                     addAddColumn();
-                    viewer.refresh();
+                    viewer.getViewer().refresh();
                 }
             }
         });
@@ -120,12 +104,12 @@ public class EI18NComposite {
     protected void createLocale(String value) {
     }
 
-    public TableViewer getViewer() {
-        return viewer;
+    public TreeViewer getViewer() {
+        return viewer.getViewer();
     }
 
     private CellEditor createLocaleEditor(String locale) {
-        return new TranslationCellEditor(viewer.getTable(), locale) {
+        return new TranslationCellEditor(viewer.getViewer().getTree(), locale) {
             private EditionLine line;
 
             @Override
@@ -156,13 +140,13 @@ public class EI18NComposite {
         columnProps.add(KEY_COLUMN_PROPERTY);
         columnProps.add(EMPTY);
         List<CellEditor> editors=Lists.newArrayList();
-        CellEditor cellEditor=new TextCellEditor(viewer.getTable());
+        CellEditor cellEditor=new TextCellEditor(viewer.getViewer().getTree());
         editors.add(cellEditor);
         cellEditor=createLocaleEditor(EMPTY);
         editors.add(cellEditor);
         for (String locale : locales) {
             if (!locale.isEmpty()) {
-                TableColumn column=createColumn(100, locale);
+                TreeColumn column=createColumn(100, locale);
                 column.setImage(EI18NImage.getImage(LocaleUtils.toLocale(locale)));
                 //                column.setData(locale);
                 columnProps.add(locale);
@@ -170,18 +154,18 @@ public class EI18NComposite {
             }
         }
         columnProps.add(ADD_COLUMN_PROPERTY);
-        viewer.setColumnProperties(columnProps.toArray(new String[] {}));
-        viewer.setCellEditors(editors.toArray(new CellEditor[] {}));
+        viewer.getViewer().setColumnProperties(columnProps.toArray(new String[] {}));
+        viewer.getViewer().setCellEditors(editors.toArray(new CellEditor[] {}));
     }
 
     public String getLocale(int columnIndex) {
-        String columnProperty=(String) viewer.getColumnProperties()[columnIndex];
+        String columnProperty=(String) viewer.getViewer().getColumnProperties()[columnIndex];
         if (ADD_COLUMN_PROPERTY.equals(columnProperty) || KEY_COLUMN_PROPERTY.equals(columnProperty))
             return null;
         return columnProperty;
     }
 
     protected Shell getShell() {
-        return viewer.getControl().getShell();
+        return viewer.getViewer().getControl().getShell();
     }
 }
