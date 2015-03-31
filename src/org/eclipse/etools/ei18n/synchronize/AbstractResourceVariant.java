@@ -141,7 +141,7 @@ abstract class AbstractResourceVariant implements IResourceVariant {
 
         Matcher matcher=EI18NConstants.LOCALE_PATTERN.matcher(filename);
         if (matcher.matches()) {
-            return matcher.group(1);
+            return matcher.group(EI18NConstants.LOCALE_GROUP);
         }
         return null;
     }

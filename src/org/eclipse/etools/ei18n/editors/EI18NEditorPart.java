@@ -321,29 +321,6 @@ public class EI18NEditorPart extends MultiPageEditorPart
         createColumn(500, "Key"); //$NON-NLS-1$
         createColumn(200, "Default Traduction").setImage(EI18NImage.LOGO_16.getImage()); //$NON-NLS-1$
 
-        //        ei18nComposite=new EI18NComposite(composite) {
-        //
-        //            @Override
-        //            protected void createLocale(String locale) {
-        //                // TODO CME
-        //                IFile newFile=propertyFile.getParent().getFile(new Path("messages_" + locale + ".properties")); //$NON-NLS-1$//$NON-NLS-2$
-        //                try {
-        //                    newFile.create(new NullInputStream(0L), false, new NullProgressMonitor());
-        //                    loadPropertyTab(locale, newFile);
-        //                    // TODO CME
-        //                    //                    locales.add(value);
-        //                    //                    setLocales(locales);
-        //
-        //                    //                    for (Line key : getKeys()) {
-        //                    //                    ei18nComposite.getViewer().refresh();//update(key, columns);
-        //                    //                    }
-        //
-        //                    //                    refreshColumns(locale);
-        //                } catch (CoreException e) {
-        //                    Activator.logError("Failed creating file " + newFile, e); //$NON-NLS-1$
-        //                }
-        //            }
-        //        };
         viewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, gLayout.numColumns, 1));
         int mainPageIndex=addPage(composite);
         setPageText(mainPageIndex, EI18N);
@@ -357,20 +334,22 @@ public class EI18NEditorPart extends MultiPageEditorPart
         updateJavaFile();
 
         try {
-            IContainer folder=propertyFile.getParent();
-            for (IResource res : folder.members()) {
-                String name=res.getName();
-                Matcher matcher;
-                if (EI18NConstants.PATTERN.matcher(name).matches()) {
-                    //                file=(IFile) res;
-                    loadPropertyTab(EMPTY, (IFile) res);
-                } else if ((matcher=EI18NConstants.LOCALE_PATTERN.matcher(name)).matches()) {
-                    //                locales.add(matcher.group(1));
-                    //                localFiles.add((IFile) res);
-                    loadPropertyTab(matcher.group(1), (IFile) res);
+            Matcher matcher=EI18NConstants.PATTERN.matcher(propertyFile.getName());
+            if (matcher.matches()) {
+                String baseName=matcher.group(1);
+                IContainer folder=propertyFile.getParent();
+                for (IResource res : folder.members()) {
+                    String name=res.getName();
+
+                    if ((matcher=EI18NConstants.PATTERN.matcher(name)).matches() && baseName.equals(matcher.group(EI18NConstants.BASE_NAME_GROUP))) {
+                        loadPropertyTab(EMPTY, (IFile) res);
+                    } else if ((matcher=EI18NConstants.LOCALE_PATTERN.matcher(name)).matches()
+                            && baseName.equals(matcher.group(EI18NConstants.BASE_NAME_GROUP))) {
+                        loadPropertyTab(matcher.group(EI18NConstants.LOCALE_GROUP), (IFile) res);
+                    }
                 }
+                setLocales(infos.keySet());
             }
-            setLocales(infos.keySet());
         } catch (CoreException e1) {
             Activator.logError("Failed loading locales", e1); //$NON-NLS-1$
         }

@@ -43,7 +43,7 @@ public enum EI18NImage {
     public static Image getImage(IFile file) {
         Matcher matcher;
         if ((matcher=EI18NConstants.LOCALE_PATTERN.matcher(file.getName())).matches()) {
-            String resourcePath="/icons/ei18n/flags/" + matcher.group(1) + ".png"; //$NON-NLS-1$ //$NON-NLS-2$
+            String resourcePath="/icons/ei18n/flags/" + matcher.group(EI18NConstants.LOCALE_GROUP) + ".png"; //$NON-NLS-1$ //$NON-NLS-2$
             if (Activator.getDefault().getBundle().getResource(resourcePath) != null)
                 return IMAGE_REGISTRY.get(resourcePath);
         }

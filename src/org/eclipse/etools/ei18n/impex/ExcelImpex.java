@@ -135,8 +135,8 @@ public class ExcelImpex implements IImpex {
                         line=lines.get(line);
                     }
 
-                    line.files.put(matcher.group(1), file);
-                    locales.add(matcher.group(1));
+                    line.files.put(matcher.group(EI18NConstants.LOCALE_GROUP), file);
+                    locales.add(matcher.group(EI18NConstants.LOCALE_GROUP));
                 }
             }
             {

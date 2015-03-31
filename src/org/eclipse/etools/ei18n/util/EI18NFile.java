@@ -88,7 +88,7 @@ public class EI18NFile {
 	protected String getLocale(ZipEntry entry) {
         Matcher matcher=EI18NConstants.LOCALE_PATTERN.matcher(StringUtils.substringAfterLast(entry.getName(), "/")); //$NON-NLS-1$
 		if (matcher.matches())
-			return matcher.group(1);
+            return matcher.group(EI18NConstants.LOCALE_GROUP);
 
 		return null;
 	}
