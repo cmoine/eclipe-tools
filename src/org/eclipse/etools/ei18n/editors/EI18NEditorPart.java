@@ -62,6 +62,8 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ltk.core.refactoring.DocumentChange;
 import org.eclipse.swt.SWT;
@@ -77,8 +79,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -954,8 +958,65 @@ public class EI18NEditorPart extends MultiPageEditorPart
         viewer.getViewer().getControl().setFocus();
     }
 
+    private static class MyViewerComparator extends ViewerComparator {
+        private final int column;
+        private final boolean invert;
+
+        public MyViewerComparator(int column, boolean invert) {
+            this.column=column;
+            this.invert=invert;
+        }
+
+        @Override
+        public int compare(Viewer viewer, Object e1, Object e2) {
+            if (((Line) e1).isNew())
+                return 1;
+            if (((Line) e2).isNew())
+                return -1;
+
+            String name1=getLabel(viewer, e1);
+            String name2=getLabel(viewer, e2);
+
+            if (invert)
+                return StringUtils.defaultString(name2).compareToIgnoreCase(StringUtils.defaultString(name1));
+            else
+                return StringUtils.defaultString(name1).compareToIgnoreCase(StringUtils.defaultString(name2));
+        }
+
+        private String getLabel(Viewer viewer, Object e) {
+            return ((ITableLabelProvider) ((TreeViewer) viewer).getLabelProvider()).getColumnText(e, column);
+        }
+    }
+
     protected TreeColumn createColumn(int width, String text) {
+        final int columnCount=viewer.getViewer().getTree().getColumnCount();
+
         TreeColumn column=new TreeColumn(viewer.getViewer().getTree(), SWT.NONE);
+        column.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                TreeColumn column=(TreeColumn) event.widget;
+                Tree tree=viewer.getViewer().getTree();
+                int direction=tree.getSortDirection();
+                int newDirection;
+                switch (direction) {
+                    case SWT.NONE: {
+                        viewer.getViewer().setComparator(new MyViewerComparator(columnCount, false));
+                        newDirection=SWT.UP;
+                        break;
+                    }
+                    case SWT.UP: {
+                        viewer.getViewer().setComparator(new MyViewerComparator(columnCount, true));
+                        newDirection=SWT.DOWN;
+                        break;
+                    }
+                    default:
+                        viewer.getViewer().setComparator(null);
+                        newDirection=SWT.NONE;
+                }
+                tree.setSortDirection(newDirection);
+                tree.setSortColumn(newDirection == SWT.NONE ? null : column);
+            }
+        });
         column.setWidth(width);
         column.setText(text);
         return column;
@@ -971,6 +1032,9 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     protected void addAddColumn() {
+        if (!mappingPreference.isEditable())
+            return;
+
         final TreeColumn addColumn=new TreeColumn(viewer.getViewer().getTree(), SWT.NONE);
         addColumn.setWidth(30);
         addColumn.addSelectionListener(new SelectionAdapter() {
