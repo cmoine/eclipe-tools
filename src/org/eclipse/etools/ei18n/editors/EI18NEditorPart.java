@@ -9,20 +9,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 
 import javax.lang.model.SourceVersion;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -38,6 +38,8 @@ import org.eclipse.etools.ei18n.util.Escapers;
 import org.eclipse.etools.ei18n.util.FontUtil;
 import org.eclipse.etools.ei18n.util.LineProperties;
 import org.eclipse.etools.ei18n.util.MappingPreference;
+import org.eclipse.etools.ei18n.util.PreferencesUtil;
+import org.eclipse.etools.ei18n.util.StorageUtil;
 import org.eclipse.etools.ei18n.util.TranslationCellEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
 import org.eclipse.jdt.internal.ui.propertiesfileeditor.PropertiesFileEditor;
@@ -90,6 +92,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
@@ -136,12 +139,12 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     private static class Information {
-        private final IFile file;
+        private final IStorage file;
         private final LineProperties properties;
         private final IDocument doc;
         private final TextEditor editor;
 
-        public Information(IFile file, LineProperties lineProps, TextEditor editor, IDocument doc) {
+        public Information(IStorage file, LineProperties lineProps, TextEditor editor, IDocument doc) {
             this.file=file;
             properties=lineProps;
             this.editor=editor;
@@ -237,10 +240,12 @@ public class EI18NEditorPart extends MultiPageEditorPart
     private CompilationUnitEditor javaEditor;
     private IFile javaFile;
     private Link link;
-    private IFile propertyFile;
+    //    private IFile propertyFile;
     private MappingPreference mappingPreference;
 
     private Combo combo;
+
+    private IStorage storage;
 
     @Override
     protected void createPages() {
@@ -279,7 +284,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
             private void changeAssociation() {
                 JavaFileSelectionDialog dialog=new JavaFileSelectionDialog(getShell(), "Please select the compilation unit it is linked with", getProject(),
-                        javaFile == null ? (IFile) propertyFile.getParent().findMember("Messages.java") : javaFile);
+                        javaFile == null ? (IFile) getPropertyFile().getParent().findMember("Messages.java") : javaFile);
 
                 if (dialog.open() == Window.OK) {
                     try {
@@ -334,19 +339,26 @@ public class EI18NEditorPart extends MultiPageEditorPart
         updateJavaFile();
 
         try {
-            Matcher matcher=EI18NConstants.PATTERN.matcher(propertyFile.getName());
+            Matcher matcher=EI18NConstants.PATTERN.matcher(storage.getName());
             if (matcher.matches()) {
                 String baseName=matcher.group(1);
-                IContainer folder=propertyFile.getParent();
-                for (IResource res : folder.members()) {
+                //                IJarEntryResource
+                Map<String, IStorage> map=new TreeMap<String, IStorage>();
+                map.put(EMPTY, storage);
+                //                IContainer folder=getPropertyFile().getParent();
+                for (IStorage res : StorageUtil.members(storage)/*folder.members()*/) {
                     String name=res.getName();
 
-                    if ((matcher=EI18NConstants.PATTERN.matcher(name)).matches() && baseName.equals(matcher.group(EI18NConstants.BASE_NAME_GROUP))) {
-                        loadPropertyTab(EMPTY, (IFile) res);
-                    } else if ((matcher=EI18NConstants.LOCALE_PATTERN.matcher(name)).matches()
+                    //                    if ((matcher=EI18NConstants.PATTERN.matcher(name)).matches() && baseName.equals(matcher.group(EI18NConstants.BASE_NAME_GROUP))) {
+                    //                        loadPropertyTab(EMPTY, res);
+                    //                    } else
+                    if ((matcher=EI18NConstants.LOCALE_PATTERN.matcher(name)).matches()
                             && baseName.equals(matcher.group(EI18NConstants.BASE_NAME_GROUP))) {
-                        loadPropertyTab(matcher.group(EI18NConstants.LOCALE_GROUP), (IFile) res);
+                        map.put(matcher.group(EI18NConstants.LOCALE_GROUP), res);
                     }
+                }
+                for (Entry<String, IStorage> entry : map.entrySet()) {
+                    loadPropertyTab(entry.getKey(), entry.getValue());
                 }
                 setLocales(infos.keySet());
             }
@@ -454,14 +466,14 @@ public class EI18NEditorPart extends MultiPageEditorPart
             protected String getLine(Information info, String key, String value) {
                 Charset charset;
                 try {
-                    charset=Charset.forName(info.file.getCharset());
+                    charset=Charset.forName(((IFile) info.file).getCharset());
                 } catch (Throwable e) {
                     charset=Charset.defaultCharset();
                     Activator.logError("Failed to get charset of " + info.file, e); //$NON-NLS-1$
                 }
                 byte[] encode=mappingPreference.getEncoding().encode(value, charset);
                 String str=new String(encode, charset);
-                return key + "=" + str + IOUtils.LINE_SEPARATOR; //$NON-NLS-1$
+                return key + "=" + str + PreferencesUtil.getLineDelimiter(((IFile) info.file).getProject()); //$NON-NLS-1$
             }
 
             public Object getValue(Object element, String property) {
@@ -484,7 +496,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
             }
 
             public boolean canModify(Object element, String property) {
-                return true;
+                return mappingPreference.isEditable();
             }
         });
         updateInput();
@@ -559,7 +571,8 @@ public class EI18NEditorPart extends MultiPageEditorPart
                 input.add(new Line(key));
             }
         }
-        input.add(new Line());
+        if (mappingPreference.isEditable())
+            input.add(new Line());
         viewer.getViewer().setInput(input);
         updateJavaContent();
     }
@@ -589,7 +602,9 @@ public class EI18NEditorPart extends MultiPageEditorPart
         }
 
         //
-        if (!mappingPreference.isManaged()) {
+        if (!mappingPreference.isEditable()) {
+            link.setText(EMPTY);
+        } else if (!mappingPreference.isManaged()) {
             link.setText("<a href=\"change\">Bind with a java file</a>, or simply <a href=\"manage\">manage it</a>."/*, or create a <a href=\"new\">new</a> one"*/);
         } else if (javaFile == null) {
             link.setText("Currently managed. <a href=\"unmanage\">Unmanage it</a>."/*, or create a <a href=\"new\">new</a> one"*/);
@@ -638,20 +653,24 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     private IProject getProject() {
-        return propertyFile.getProject();
+        IFile propertyFile=getPropertyFile();
+        return propertyFile == null ? null : propertyFile.getProject();
     }
 
-    protected void loadPropertyTab(String locale, IFile f) {
+    protected void loadPropertyTab(String locale, IStorage f) {
         try {
             //            Information info=new Information();
             LineProperties lineProps=new LineProperties(f);
             //            props.put(locale, lineProps);
 
-            FileEditorInput editorInput=new FileEditorInput(f);
+            //            FileEditorInput editorInput=new FileEditorInput(f);
+            //            if(f instanceof IFile)
+            //                editorInput=new FileEditorInput((IFile)f);
+
             TextEditor editor=new PropertiesFileEditor();
             //            editors.add(editor);
 
-            int editorIndex=addPage(editor, editorInput);
+            int editorIndex=addPage(editor, getEditorInput());
             setPageText(editorIndex, f.getName());
             setPageImage(editorIndex, WorkbenchPlugin.getDefault().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE));
 
@@ -784,46 +803,50 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
     @Override
     public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-        //        try {
-        propertyFile=(IFile) input.getAdapter(IFile.class);
-        mappingPreference=new MappingPreference(propertyFile);
+        try {
+            storage=((IStorageEditorInput) input).getStorage();
+            mappingPreference=new MappingPreference(storage);
+            //        if(propertyFile!=null) {
+            //        } else if(input instanceof IStorageEditorInput) {
+            //            ((IStorageEditorInput)input).getStorage().getName()
+            //        }
 
-        //
-        // try {
-        // IJavaElement elt=JavaCore.create(file.getParent());
-        //
-        // List<IPackageFragment> pkgs;
-        // if (elt instanceof IPackageFragment)
-        // pkgs=Collections.singletonList((IPackageFragment) elt);
-        // else if (elt instanceof IPackageFragmentRoot)
-        // pkgs=Lists.newArrayList(Iterables.filter(Arrays.asList(((IPackageFragmentRoot) elt).getChildren()), IPackageFragment.class));
-        // else
-        // pkgs=Collections.emptyList();
-        //
-        // for (IPackageFragment pkg : pkgs) {
-        // for (ICompilationUnit cu : pkg.getCompilationUnits()) {
-        // if (CompilationUnitUtil.isValid(cu)) {
-        // this.cu=cu;
-        // }
-        // }
-        // }
-        // } catch (JavaModelException e2) {
-        //                Activator.log(ERROR, "Failed to read compilation unit", e2); //$NON-NLS-1$
-        // }
+            //
+            // try {
+            // IJavaElement elt=JavaCore.create(file.getParent());
+            //
+            // List<IPackageFragment> pkgs;
+            // if (elt instanceof IPackageFragment)
+            // pkgs=Collections.singletonList((IPackageFragment) elt);
+            // else if (elt instanceof IPackageFragmentRoot)
+            // pkgs=Lists.newArrayList(Iterables.filter(Arrays.asList(((IPackageFragmentRoot) elt).getChildren()), IPackageFragment.class));
+            // else
+            // pkgs=Collections.emptyList();
+            //
+            // for (IPackageFragment pkg : pkgs) {
+            // for (ICompilationUnit cu : pkg.getCompilationUnits()) {
+            // if (CompilationUnitUtil.isValid(cu)) {
+            // this.cu=cu;
+            // }
+            // }
+            // }
+            // } catch (JavaModelException e2) {
+            //                Activator.log(ERROR, "Failed to read compilation unit", e2); //$NON-NLS-1$
+            // }
 
-        setSite(site);
-        setPartName(propertyFile.getName());
+            setSite(site);
+            setPartName(storage.getName());
 
-        //            IType type=FindBrokenNLSKeysAction.getAccessorType(file);
-        //            if (type != null) {
-        //                cu=type.getCompilationUnit();
-        //                javaFile=(IFile) type.getResource();
-        //            }
-        setInput(new FileEditorInput(propertyFile));
-        site.setSelectionProvider(new MultiPageSelectionProvider(this));
-        //        } catch (CoreException e) {
-        //            throw new PartInitException("Failed to init", e); //$NON-NLS-1$
-        //        }
+            //            IType type=FindBrokenNLSKeysAction.getAccessorType(file);
+            //            if (type != null) {
+            //                cu=type.getCompilationUnit();
+            //                javaFile=(IFile) type.getResource();
+            //            }
+            setInput(input /* new FileEditorInput(propertyFile) */);
+            site.setSelectionProvider(new MultiPageSelectionProvider(this));
+        } catch (CoreException e) {
+            throw new PartInitException("Failed to init", e); //$NON-NLS-1$
+        }
     }
 
     @Override
@@ -918,7 +941,8 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     private JavaMappingExtension getSelectedExtension() {
-        return EI18nPropertyPage.getExtension(getProject());
+        IProject project=getProject();
+        return project == null ? null : EI18nPropertyPage.getExtension(project);
     }
 
     private Shell getShell() {
@@ -1045,9 +1069,13 @@ public class EI18NEditorPart extends MultiPageEditorPart
         return columnProperty;
     }
 
+    private IFile getPropertyFile() {
+        return (IFile) getEditorInput().getAdapter(IFile.class);
+    }
+
     protected void createLocale(String locale) {
         // TODO CME
-        IFile newFile=propertyFile.getParent().getFile(new Path("messages_" + locale + ".properties")); //$NON-NLS-1$//$NON-NLS-2$
+        IFile newFile=getPropertyFile().getParent().getFile(new Path("messages_" + locale + ".properties")); //$NON-NLS-1$//$NON-NLS-2$
         try {
             newFile.create(new NullInputStream(0L), false, new NullProgressMonitor());
             loadPropertyTab(locale, newFile);

@@ -12,7 +12,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.etools.ei18n.util.PreferencesUtil;
 import org.eclipse.team.core.TeamException;
 import org.eclipse.team.core.variants.IResourceVariant;
 
@@ -55,7 +55,7 @@ public class XLSResourceVariant extends AbstractResourceVariant {
         for (String line : IOUtils.readLines(new ByteArrayInputStream(baos.toByteArray()))) {
             line=StringUtils.trimToEmpty(line);
             if (!line.isEmpty() && !line.startsWith("#")) { //$NON-NLS-1$
-                buf.append(line).append(System.getProperty(Platform.PREF_LINE_SEPARATOR));
+                buf.append(line).append(PreferencesUtil.getLineDelimiter());
             }
         }
         return new ByteArrayInputStream(buf.toString().getBytes());
@@ -65,7 +65,6 @@ public class XLSResourceVariant extends AbstractResourceVariant {
         switch (cell.getCellType()) {
             case Cell.CELL_TYPE_NUMERIC:
                 String string=Double.toString(cell.getNumericCellValue());
-                //                Assert.isTrue(string.endsWith(".0"), "Must not be decimal"); //$NON-NLS-1$ //$NON-NLS-2$
                 string=StringUtils.removeEnd(string, ".0"); //$NON-NLS-1$
                 return string;
             case Cell.CELL_TYPE_STRING:
@@ -73,7 +72,6 @@ public class XLSResourceVariant extends AbstractResourceVariant {
             case Cell.CELL_TYPE_BLANK:
             default:
                 return null;
-                // return cell.getRawValue();
         }
     }
 

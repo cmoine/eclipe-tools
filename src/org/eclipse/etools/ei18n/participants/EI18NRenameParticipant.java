@@ -3,7 +3,6 @@ package org.eclipse.etools.ei18n.participants;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -14,6 +13,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
 import org.eclipse.etools.ei18n.util.LineProperties;
+import org.eclipse.etools.ei18n.util.PreferencesUtil;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -67,7 +67,8 @@ public class EI18NRenameParticipant extends RenameParticipant {
                 IRegion region=properties.getRegion(oldName);
                 TextFileChange change=new TextFileChange("Remove key " + oldName, srcFile); //$NON-NLS-1$
                 change.setEdit(new ReplaceEdit(region.getOffset(), region.getLength() + properties.getLineDelimiter(oldName).length(), getArguments()
-                        .getNewName() + "=" + StringEscapeUtils.escapeJava(properties.getProperty(oldName)) + IOUtils.LINE_SEPARATOR)); //$NON-NLS-1$
+                        .getNewName()
+                        + "=" + StringEscapeUtils.escapeJava(properties.getProperty(oldName)) + PreferencesUtil.getLineDelimiter(srcFile.getProject()))); //$NON-NLS-1$
                 changes.add(change);
             }
         } catch (IOException e) {

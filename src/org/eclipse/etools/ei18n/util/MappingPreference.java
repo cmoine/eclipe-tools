@@ -6,9 +6,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.internal.preferences.DefaultPreferences;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.etools.Activator;
@@ -20,24 +22,32 @@ import com.google.common.collect.Lists;
 public class MappingPreference {
     private final IEclipsePreferences prefs;
     private final String keyFile;
-    private final IFile propertyFile;
+    private final IStorage propertyFile;
     private final String encodingKeyFile;
 
-    public MappingPreference(IFile propertyFile) {
+    public MappingPreference(IStorage propertyFile) {
         this.propertyFile=propertyFile;
-        prefs=new ProjectScope(propertyFile.getProject()).getNode(Activator.PLUGIN_ID);
+        if (isEditable())
+            prefs=new ProjectScope(getPropertyFile().getProject()).getNode(Activator.PLUGIN_ID);
+        else
+            prefs=new DefaultPreferences();
+
         keyFile=propertyFile.toString();
         encodingKeyFile='E' + keyFile;
     }
 
+    public boolean isEditable() {
+        return propertyFile instanceof IFile;
+    }
+
     public IFile getPropertyFile() {
-        return propertyFile;
+        return (IFile) propertyFile;
     }
 
     public IFile getJavaFile() {
         String value=prefs.get(keyFile, null);
         if (StringUtils.isNotEmpty(value)) {
-            IFile file=(IFile) propertyFile.getProject().findMember(value);
+            IFile file=(IFile) getPropertyFile().getProject().findMember(value);
             if (file != null) {
                 return file;
             }

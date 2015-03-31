@@ -16,9 +16,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
+import org.eclipse.etools.ei18n.util.PreferencesUtil;
 import org.eclipse.jface.text.DefaultLineTracker;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.team.core.TeamException;
@@ -111,7 +111,7 @@ abstract class AbstractResourceVariant implements IResourceVariant {
                 }
                 for (String line : lines) {
                     if (!line.trim().startsWith("#")) //$NON-NLS-1$
-                        buf.append(line).append(System.getProperty(Platform.PREF_LINE_SEPARATOR));
+                        buf.append(line).append(PreferencesUtil.getLineDelimiter(iFile == null ? null : iFile.getProject()));
                 }
                 return createStorage(buf.toString());
             }

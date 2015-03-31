@@ -3,7 +3,6 @@ package org.eclipse.etools.ei18n.participants;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -14,6 +13,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
 import org.eclipse.etools.ei18n.util.LineProperties;
+import org.eclipse.etools.ei18n.util.PreferencesUtil;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
@@ -77,7 +77,7 @@ public class EI18NMoveParticipant extends MoveParticipant {
                 {
                     String line=properties.getLine(key);
                     TextFileChange change=new TextFileChange("Add key " + key, dstFile); //$NON-NLS-1$
-                    change.setEdit(new InsertEdit(0, line.replaceAll("\\r|\\n", StringUtils.EMPTY) + IOUtils.LINE_SEPARATOR)); //$NON-NLS-1$
+                    change.setEdit(new InsertEdit(0, line.replaceAll("\\r|\\n", StringUtils.EMPTY) + PreferencesUtil.getLineDelimiter(dstFile.getProject()))); //$NON-NLS-1$
                     changes.add(change);
                 }
             }

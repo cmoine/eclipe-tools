@@ -11,7 +11,7 @@ import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultLineTracker;
@@ -40,13 +40,13 @@ public class LineProperties implements Iterable<String> {
     }
 
     private final Map<String, LineInformation> lines=Maps.newHashMap();
-    private final IFile file;
+    private final IStorage file;
 
-    public LineProperties(IFile file) throws IOException, BadLocationException, CoreException {
+    public LineProperties(IStorage file) throws IOException, BadLocationException, CoreException {
         this.file=file;
         InputStream is=null;
         try {
-            String content=IOUtils.toString(is=file.getContents(), file.getCharset(true));
+            String content=IOUtils.toString(is=file.getContents(), StorageUtil.getCharset(file).name());
             reload(content);
         } finally {
             IOUtils.closeQuietly(is);
@@ -106,7 +106,7 @@ public class LineProperties implements Iterable<String> {
         return Iterables.filter(lines.keySet(), String.class).iterator();
     }
 
-    public IFile getFile() {
+    public IStorage getFile() {
         return file;
     }
 }
