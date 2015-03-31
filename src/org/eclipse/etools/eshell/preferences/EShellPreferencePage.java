@@ -7,6 +7,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class EShellPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage, EShellPreferencesConstants {
+    public static final String ID=EShellPreferencePage.class.getName();
+
     public EShellPreferencePage() {
         super(GRID);
     }

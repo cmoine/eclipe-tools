@@ -25,7 +25,8 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class EFavoritesStartup implements IStartup {
     public void earlyStartup() {
-        configure();
+        // FIXME NPE when exits
+        //        configure();
     }
 
     protected void configure() {

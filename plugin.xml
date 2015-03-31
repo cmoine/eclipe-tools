@@ -144,14 +144,14 @@
       </page>
       <page
             category="org.eclipse.etools.EtoolsPreferencePage"
-            class="org.eclipse.etools.ei18n.preferences.BingPreferencePage"
-            id="org.eclipse.etools.ei18n.preferences.BingPreferencePage"
-            name="BING Translator">
+            class="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            id="org.eclipse.etools.ei18n.preferences.EI18NPreferencePage"
+            name="Ei18n">
       </page>
       <page
             category="org.eclipse.etools.EtoolsPreferencePage"
             class="org.eclipse.etools.eshell.preferences.EShellPreferencePage"
-            id="eclipe-tools.page1"
+            id="org.eclipse.etools.eshell.preferences.EShellPreferencePage"
             name="EShell">
       </page>
    </extension>

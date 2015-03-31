@@ -3,6 +3,7 @@ package org.eclipse.etools.ei18n.editors;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,7 +18,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.NullInputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -34,6 +34,7 @@ import org.eclipse.etools.ei18n.extensions.IJavaMapping;
 import org.eclipse.etools.ei18n.extensions.JavaMappingExtensionManager.JavaMappingExtension;
 import org.eclipse.etools.ei18n.properties.EI18nPropertyPage;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
+import org.eclipse.etools.ei18n.util.Escapers;
 import org.eclipse.etools.ei18n.util.FontUtil;
 import org.eclipse.etools.ei18n.util.LineProperties;
 import org.eclipse.etools.ei18n.util.MappingPreference;
@@ -99,6 +100,7 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.part.MultiPageSelectionProvider;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -134,16 +136,17 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     private static class Information {
+        private final IFile file;
+        private final LineProperties properties;
+        private final IDocument doc;
+        private final TextEditor editor;
+
         public Information(IFile file, LineProperties lineProps, TextEditor editor, IDocument doc) {
-            //            this.file=file;
+            this.file=file;
             properties=lineProps;
             this.editor=editor;
             this.doc=doc;
         }
-
-        private final LineProperties properties;
-        private final IDocument doc;
-        private final TextEditor editor;
     }
 
     private class ViewLabelProvider extends LabelProvider implements ITableLabelProvider, ITableColorProvider, ITableFontProvider {
@@ -237,6 +240,8 @@ public class EI18NEditorPart extends MultiPageEditorPart
     private IFile propertyFile;
     private MappingPreference mappingPreference;
 
+    private Combo combo;
+
     @Override
     protected void createPages() {
         // Get all concerned files
@@ -251,13 +256,22 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                //                switch(e.text) {
-                //                    case "change": {
-                //                        break;
-                //                    }
-                //                }
                 if ("change".equals(e.text)) { //$NON-NLS-1$
                     changeAssociation();
+                } else if ("manage".equals(e.text)) { //$NON-NLS-1$
+                    try {
+                        mappingPreference.manage();
+                        updateJavaFile();
+                    } catch (BackingStoreException e1) {
+                        Activator.logError("Failed to store mapping pref (manage)", e1); //$NON-NLS-1$
+                    }
+                } else if ("unmanage".equals(e.text)) { //$NON-NLS-1$
+                    try {
+                        mappingPreference.unmanage();
+                        updateJavaFile();
+                    } catch (BackingStoreException e1) {
+                        Activator.logError("Failed to store mapping pref (unmanage)", e1); //$NON-NLS-1$
+                    }
                 } else if ("goto".equals(e.text)) { //$NON-NLS-1$
                     setActivePage(1);
                 }
@@ -270,24 +284,34 @@ public class EI18NEditorPart extends MultiPageEditorPart
                 if (dialog.open() == Window.OK) {
                     try {
                         IFile file=(IFile) ((org.eclipse.jdt.internal.core.CompilationUnit) dialog.getFirstResult()).getCorrespondingResource();
-                        //                        getProject().setPersistentProperty(qualifiedName, file.getFullPath().makeRelativeTo(getProject().getFullPath()).toString());
-                        mappingPreference.set(file/*, (JavaMappingExtension) ((IStructuredSelection) comboViewer.getSelection()).getFirstElement()*/);
-                        //                        prefs.put(propertyFile.toString(), file.getFullPath().makeRelativeTo(getProject().getFullPath()).toString());
-                        //                        prefs.flush();
-                        //                            updateLink();
+                        mappingPreference.set(file);
                         updateJavaFile();
                     } catch (CoreException e1) {
                         Activator.logError("Failed to set association", e1); //$NON-NLS-1$
                     } catch (BackingStoreException e) {
-                        Activator.logError("Failed to store mapping pref", e); //$NON-NLS-1$
+                        Activator.logError("Failed to store mapping pref (bind)", e); //$NON-NLS-1$
                     }
 
                 }
             }
         });
         link.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-        new Label(composite, SWT.NONE).setText("Encoding: ");
-        new Combo(composite, SWT.READ_ONLY);
+        new Label(composite, SWT.NONE).setText("Characters escaping: ");
+        combo=new Combo(composite, SWT.READ_ONLY);
+        for (Escapers enc : Escapers.values()) {
+            combo.add(enc.name());
+        }
+        combo.select(mappingPreference.getEncoding().ordinal());
+        combo.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                try {
+                    mappingPreference.setEncoding(Escapers.values()[combo.getSelectionIndex()]);
+                } catch (BackingStoreException e1) {
+                    Activator.logError("Failed to store mapping pref (encoding)", e1); //$NON-NLS-1$
+                }
+            }
+        });
 
         viewer=new FilteredTree(composite, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL, new PatternFilter(), true);
         viewer.getViewer().setContentProvider(MyContentProvider.INSTANCE);
@@ -379,6 +403,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
                                 DocumentChange change=new DocumentChange(EI18N, info.doc);
                                 IRegion region=lineProperties.getRegion(key);
                                 change.setEdit(new ReplaceEdit(region.getOffset(), region.getLength() + lineProperties.getLineDelimiter(key).length(), getLine(
+                                        info,
                                         newKey, val)));
                                 changes.add(change);
                             }
@@ -417,10 +442,11 @@ public class EI18NEditorPart extends MultiPageEditorPart
                         //                        String val=((TranslationLine) value).getValue();
                         String val=(String) value;
                         if (!lineProperties.contains(key)) {
-                            change.setEdit(new InsertEdit(0, getLine(key, val)));
+                            change.setEdit(new InsertEdit(0, getLine(info, key, val)));
                         } else {
                             IRegion region=lineProperties.getRegion(key);
-                            change.setEdit(new ReplaceEdit(region.getOffset(), region.getLength() + lineProperties.getLineDelimiter(key).length(), getLine(key,
+                            change.setEdit(new ReplaceEdit(region.getOffset(), region.getLength() + lineProperties.getLineDelimiter(key).length(), getLine(
+                                    info, key,
                                     val)));
                         }
                         changes.add(change);
@@ -446,13 +472,22 @@ public class EI18NEditorPart extends MultiPageEditorPart
                 }
             }
 
-            protected String getLine(String key, String value) {
-                return key + "=" + StringEscapeUtils.escapeJava(value) + IOUtils.LINE_SEPARATOR; //$NON-NLS-1$
+            protected String getLine(Information info, String key, String value) {
+                Charset charset;
+                try {
+                    charset=Charset.forName(info.file.getCharset());
+                } catch (Throwable e) {
+                    charset=Charset.defaultCharset();
+                    Activator.logError("Failed to get charset of " + info.file, e); //$NON-NLS-1$
+                }
+                byte[] encode=mappingPreference.getEncoding().encode(value, charset);
+                String str=new String(encode, charset);
+                return key + "=" + str + IOUtils.LINE_SEPARATOR; //$NON-NLS-1$
             }
 
             public Object getValue(Object element, String property) {
                 if (property == KEY_COLUMN_PROPERTY)
-                    return ((Line) element).getString();
+                    return Strings.nullToEmpty(((Line) element).getString());
 
                 Line key=(Line) element;
                 if (key.isNew())
@@ -466,43 +501,22 @@ public class EI18NEditorPart extends MultiPageEditorPart
                     }
                 }
 
-                return new EditionLine(property, StringUtils.defaultString(infos.get(EMPTY/*property*/).properties.getProperty(key.getString())), map);
+                return new EditionLine(property, StringUtils.defaultString(infos.get(property).properties.getProperty(key.getString())), map);
             }
-
-            //            private LineProperties get(String property) {
-            //                if (property.equals(EI18NComposite.DEFAULT_COLUMN_PROPERTY))
-            //                    return props.get(0);
-            //
-            //                int index=ei18nComposite.getLocales().indexOf(property);
-            //                return props.get(index + 1);
-            //            }
 
             public boolean canModify(Object element, String property) {
                 return true;
             }
         });
-        //        Collection<StringBuffer> modifiableKeys=Lists.newArrayList(Iterables.transform(keys, STR2BUF));
-        //        modifiableKeys.add(new StringBuffer());
-        //        List<Line> input=Lists.newArrayList(Iterables.transform(keys, new Function<String, Line>() {
-        //            
-        //            public Line apply(String arg0) {
-        //                return new Line(arg0);
-        //            }
-        //        }));
-        //        input.add(new Line());
-        //        Collections.sort(input);
         updateInput();
-        //        ei18nComposite.getViewer().setSorter(new ViewerSorter() {
-        //            
-        //            public int category(Object element) {
-        //                Line buf=(Line) element;
-        //                return buf.length() == 0 ? 1 : 0;
-        //            }
-        //        });
+
         final CellEditor cellEditor=viewer.getViewer().getCellEditors()[0];
         cellEditor.setValidator(new ICellEditorValidator() {
             public String isValid(Object value) {
                 String line=(String) value;
+                if (StringUtils.isEmpty(line))
+                    return "Empty key";
+
                 if (!SourceVersion.isName(line))
                     return "Not a valid Java identifier"; //$NON-NLS-1$
 
@@ -596,11 +610,13 @@ public class EI18NEditorPart extends MultiPageEditorPart
         }
 
         //
-        if (javaFile == null) {
-            link.setText("<a href=\"change\">Associate</a>."/*, or create a <a href=\"new\">new</a> one"*/);
+        if (!mappingPreference.isManaged()) {
+            link.setText("<a href=\"change\">Bind with a java file</a>, or simply <a href=\"manage\">manage it</a>."/*, or create a <a href=\"new\">new</a> one"*/);
+        } else if (javaFile == null) {
+            link.setText("Currently managed. <a href=\"unmanage\">Unmanage it</a>."/*, or create a <a href=\"new\">new</a> one"*/);
         } else {
             link.setText(format(
-                    "Currently associated with Java file ''<a href=\"goto\">{0}</a>''. <a href=\"change\">Change</a>."/*, or create a <a href=\"new\">new</a> one"*/,
+                    "Currently binded with Java file ''<a href=\"goto\">{0}</a>''. <a href=\"change\">Change it</a>, or <a href=\"unmanage\">unbind it</a>."/*, or create a <a href=\"new\">new</a> one"*/,
                     javaFile.getFullPath().toPortableString()));
             try {
                 FileEditorInput editorInput=new FileEditorInput(javaFile);
@@ -857,7 +873,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
     protected boolean hasNew() {
         for (Line line : getKeys()) {
-            if (line.getString() == null) {
+            if (line.isNew()) {
                 return true;
             }
         }
@@ -923,7 +939,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     private JavaMappingExtension getSelectedExtension() {
-        return EI18nPropertyPage.getExtension(getProject());//(JavaMappingExtension) ((IStructuredSelection) comboViewer.getSelection()).getFirstElement();
+        return EI18nPropertyPage.getExtension(getProject());
     }
 
     private Shell getShell() {
