@@ -42,6 +42,7 @@ import org.eclipse.etools.ei18n.util.PreferencesUtil;
 import org.eclipse.etools.ei18n.util.StorageUtil;
 import org.eclipse.etools.ei18n.util.TranslationCellEditor;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitEditor;
+import org.eclipse.jdt.internal.ui.javaeditor.JarEntryEditorInput;
 import org.eclipse.jdt.internal.ui.propertiesfileeditor.PropertiesFileEditor;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -631,18 +632,17 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
     protected void loadPropertyTab(String locale, IStorage f) {
         try {
-            //            Information info=new Information();
             LineProperties lineProps=new LineProperties(f);
-            //            props.put(locale, lineProps);
 
-            //            FileEditorInput editorInput=new FileEditorInput(f);
-            //            if(f instanceof IFile)
-            //                editorInput=new FileEditorInput((IFile)f);
+            IEditorInput editorInput;
+            if (f instanceof IFile)
+                editorInput=new FileEditorInput((IFile) f);
+            else
+                editorInput=new JarEntryEditorInput(f);
 
             TextEditor editor=new PropertiesFileEditor();
-            //            editors.add(editor);
 
-            int editorIndex=addPage(editor, getEditorInput());
+            int editorIndex=addPage(editor, editorInput);
             setPageText(editorIndex, f.getName());
             setPageImage(editorIndex, WorkbenchPlugin.getDefault().getSharedImages().getImage(ISharedImages.IMG_OBJ_FILE));
 
@@ -866,9 +866,8 @@ public class EI18NEditorPart extends MultiPageEditorPart
     public void select(String key) {
         if (StringUtils.isNotEmpty(key)) {
             for (Line buf : getKeys()) {
-                if (buf.getString().equals(key)) {
+                if (Strings.nullToEmpty(buf.getString()).equals(key)) {
                     viewer.getViewer().setSelection(new StructuredSelection(buf), true);
-                    //                    ei18nComposite.getViewer().reveal(buf);
                 }
             }
         }
