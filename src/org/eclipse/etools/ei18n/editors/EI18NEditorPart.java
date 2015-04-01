@@ -505,38 +505,6 @@ public class EI18NEditorPart extends MultiPageEditorPart
         });
         updateInput();
 
-        final CellEditor cellEditor=viewer.getViewer().getCellEditors()[0];
-        cellEditor.setValidator(new ICellEditorValidator() {
-            public String isValid(Object value) {
-                String line=(String) value;
-                if (StringUtils.isEmpty(line))
-                    return "Empty key";
-
-                if (!SourceVersion.isName(line))
-                    return "Not a valid Java identifier"; //$NON-NLS-1$
-
-                return containsKey(line) ? "Key already exists" : null; //$NON-NLS-1$
-            }
-        });
-        cellEditor.addListener(new ICellEditorListener() {
-
-            public void applyEditorValue() {
-                setErrorMessage(null);
-            }
-
-            private void setErrorMessage(String message) {
-                getEditorSite().getActionBars().getStatusLineManager().setErrorMessage(message);
-            }
-
-            public void cancelEditor() {
-                setErrorMessage(null);
-            }
-
-            public void editorValueChanged(boolean oldValidState, boolean newValidState) {
-                setErrorMessage(cellEditor.getErrorMessage());
-            }
-        });
-
         // ADD delete entry
         Menu menu=new Menu(viewer.getViewer().getControl());
         final MenuItem deleteItem=new MenuItem(menu, SWT.NONE);
@@ -1108,9 +1076,41 @@ public class EI18NEditorPart extends MultiPageEditorPart
         columnProps.add(KEY_COLUMN_PROPERTY);
         columnProps.add(EMPTY);
         List<CellEditor> editors=Lists.newArrayList();
-        CellEditor cellEditor=new TextCellEditor(viewer.getViewer().getTree());
-        editors.add(cellEditor);
-        cellEditor=createLocaleEditor(EMPTY);
+        final CellEditor firstCellEditor=new TextCellEditor(viewer.getViewer().getTree());
+        firstCellEditor.setValidator(new ICellEditorValidator() {
+            public String isValid(Object value) {
+                String line=(String) value;
+                if (StringUtils.isEmpty(line))
+                    return "Empty key";
+
+                if (!SourceVersion.isName(line))
+                    return "Not a valid Java identifier"; //$NON-NLS-1$
+
+                return containsKey(line) ? "Key already exists" : null; //$NON-NLS-1$
+            }
+        });
+        firstCellEditor.addListener(new ICellEditorListener() {
+
+            public void applyEditorValue() {
+                setErrorMessage(null);
+            }
+
+            private void setErrorMessage(String message) {
+                getEditorSite().getActionBars().getStatusLineManager().setErrorMessage(message);
+            }
+
+            public void cancelEditor() {
+                setErrorMessage(null);
+            }
+
+            public void editorValueChanged(boolean oldValidState, boolean newValidState) {
+                setErrorMessage(firstCellEditor.getErrorMessage());
+            }
+        });
+
+        editors.add(firstCellEditor);
+
+        CellEditor cellEditor=createLocaleEditor(EMPTY);
         editors.add(cellEditor);
         for (String locale : locales) {
             if (!locale.isEmpty()) {
