@@ -53,7 +53,7 @@ abstract class AbstractFileSelectionDialog extends ElementTreeSelectionDialog {
 
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
-        createButton(parent, IDialogConstants.CLIENT_ID, "Créer", false);
+        createButton(parent, IDialogConstants.CLIENT_ID, "Create", false);
         super.createButtonsForButtonBar(parent);
     }
 
