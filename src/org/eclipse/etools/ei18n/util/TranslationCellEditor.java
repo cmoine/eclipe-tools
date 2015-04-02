@@ -100,7 +100,7 @@ public abstract class TranslationCellEditor extends TextAndDialogCellEditor {
                     }
                 });
                 if (translations.size() == 1) {
-                    return translations.iterator().next();
+                    return translations.iterator().next().dst;
                 } else if (!translations.isEmpty()) {
                     ListDialog dialog=new ListDialog(getControl().getShell()) {
                         @Override
