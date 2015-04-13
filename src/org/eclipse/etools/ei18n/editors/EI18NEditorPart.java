@@ -603,7 +603,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
 
     private void updateJavaContent() {
         JavaMappingExtension ext=getSelectedExtension();
-        if (ext != null) {
+        if (ext != null && javaEditor != null) {
             IJavaMapping javaMapping=ext.getJavaMapping();
             Set<String> fieldsToRemove=javaMapping.getKeys();
             List<String> fieldsToAdd=new ArrayList<String>();
