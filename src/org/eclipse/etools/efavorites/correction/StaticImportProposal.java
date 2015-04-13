@@ -141,6 +141,11 @@ public class StaticImportProposal extends AbstractJavaCompletionProposal {
     }
 
     @Override
+    public String getSortString() {
+        return getDisplayString();
+    }
+
+    @Override
     public StyledString getStyledDisplayString() {
         return new StyledString().append(getDisplayString());
     }

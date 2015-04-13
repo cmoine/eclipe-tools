@@ -19,17 +19,14 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.IStartup;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
-public class EFavoritesStartup implements IStartup {
-    public void earlyStartup() {
-        // FIXME NPE when exits
-        //        configure();
+public class EFavoritesStartup {
+    private EFavoritesStartup() {
     }
 
-    protected void configure() {
+    public static void configure() {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 Shell shell=PlatformUI.getWorkbench().getModalDialogShellProvider().getShell();

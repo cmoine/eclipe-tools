@@ -70,6 +70,10 @@ public class EFavoritesQuickAssistProcessor implements IQuickAssistProcessor {
                         (node.getParent() instanceof QualifiedName //
                         || node.getParent() instanceof MethodInvocation)) {
                     proposals.add(new StaticImportProposal(context));
+
+                    AddStaticImportProposal proposal=new AddStaticImportProposal(context);
+                    if (proposal.isValid())
+                        proposals.add(proposal);
                 }
             }
 

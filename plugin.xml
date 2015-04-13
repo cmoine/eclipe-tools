@@ -638,4 +638,107 @@
             targetId="org.eclipse.jdt.ui.javaCode">
       </hyperlinkDetector>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors.templates">
+      <resolver
+            class="org.eclipse.etools.EToolsTemplateVariableResolver"
+            contextTypeId="java-statements"
+            description="ETOOLS"
+            type="line_number">
+      </resolver>
+      <template
+            autoinsert="true"
+            contextTypeId="java-statements"
+            description="ETOOLS"
+            id="eclipe-tools.template1"
+            name="debug">
+         <pattern>
+            System.out.println(&quot;${enclosing_type}.${enclosing_method}():~${line_number}&quot;);
+         </pattern>
+      </template>
+      <template
+            autoinsert="true"
+            contextTypeId="java-statements"
+            description="ETOOLS"
+            id="eclipe-tools.template2"
+            name="async_exec">
+         <pattern>
+            Display.getDefault().asyncExec(new Runnable() {
+	public void run() {
+		${cursor}
+	}
+});
+         </pattern>
+      </template>
+      <template
+            autoinsert="true"
+            contextTypeId="java-statements"
+            description="ETOOLS"
+            id="eclipe-tools.template3"
+            name="event_loop">
+         <pattern>
+            Display.getDefault().asyncExec(new Runnable() {
+	public void run() {
+		${cursor}
+	}
+});
+         </pattern>
+      </template>
+      <template
+            autoinsert="true"
+            contextTypeId="java-members"
+            description="ETOOLS"
+            id="eclipe-tools.template4"
+            name="id">
+         <pattern>
+            public static final String ID=${enclosing_type}.class.getName();
+         </pattern>
+      </template>
+      <template
+            autoinsert="true"
+            contextTypeId="java-members"
+            description="ETOOLS"
+            id="eclipe-tools.template5"
+            name="private_constructor">
+         <pattern>
+            private ${enclosing_type}() {
+}
+         </pattern>
+      </template>
+      <template
+            autoinsert="true"
+            contextTypeId="java-members"
+            description="ETOOLS"
+            id="eclipe-tools.template7"
+            name="protected_constructor">
+         <pattern>
+            protected ${enclosing_type}() {
+}
+         </pattern>
+      </template>
+      <!-- <template
+            autoinsert="true"
+            contextTypeId="java-statements"
+            description="ETOOLS"
+            id="eclipe-tools.template6"
+            name="profile">
+         <pattern>
+            ${:import(com.google.common.base.Stopwatch)}Stopwatch watch=new Stopwatch().start();
+System.err.println(&quot;${enclosing_type}.${enclosing_method}():~${line_number} =====&gt; &quot; + watch.elapsedMillis());
+         </pattern>
+      </template> -->
+      <template
+            autoinsert="true"
+            contextTypeId="java-members"
+            description="ETOOLS"
+            id="eclipe-tools.template9"
+            name="singleton">
+         <pattern>
+            public static final ${enclosing_type} INSTANCE=new ${enclosing_type}();
+
+private ${enclosing_type} () {
+}
+         </pattern>
+      </template>
+   </extension>
 </plugin>

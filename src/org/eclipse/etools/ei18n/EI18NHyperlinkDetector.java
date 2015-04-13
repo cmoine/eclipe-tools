@@ -16,12 +16,13 @@ public class EI18NHyperlinkDetector extends JavaElementHyperlinkDetector {
     @Override
     protected void addHyperlinks(List<IHyperlink> hyperlinksCollector, IRegion wordRegion, SelectionDispatchAction openAction, IJavaElement element,
             boolean qualify, JavaEditor editor) {
-        // String key=element.getElementName();
         IFile javaFile=EI18NUtil.getFile(element);
         if (javaFile != null) {
             for (MappingPreference pref : MappingPreference.list(javaFile.getProject())) {
                 if (pref.getJavaFile() != null && pref.getJavaFile().equals(javaFile)) {
-                    hyperlinksCollector.add(new EI18NHyperlink(wordRegion, openAction, element, qualify));
+                    EI18NHyperlink hyperlink=new EI18NHyperlink(wordRegion, openAction, element, qualify);
+                    if (hyperlink.isValid())
+                        hyperlinksCollector.add(hyperlink);
                 }
             }
         }

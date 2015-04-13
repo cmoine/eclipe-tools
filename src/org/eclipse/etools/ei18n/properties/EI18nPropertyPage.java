@@ -40,7 +40,9 @@ public class EI18nPropertyPage extends PropertyPage {
 
     public static JavaMappingExtension getExtension(IProject project) {
         try {
-            return JavaMappingExtensionManager.getInstance().find(project.getPersistentProperty(QNAME));//mappingPreference.getExtension();
+            JavaMappingExtension extension=JavaMappingExtensionManager.getInstance().find(project.getPersistentProperty(QNAME));
+            if (extension != null)
+                return extension;
         } catch (CoreException e1) {
             Activator.logWarning("Failed to get property", e1); //$NON-NLS-1$
         }

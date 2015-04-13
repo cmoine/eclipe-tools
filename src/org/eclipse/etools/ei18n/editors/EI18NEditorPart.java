@@ -546,7 +546,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
         }
         if (mappingPreference.isEditable())
             input.add(new Line());
-        viewer.getViewer().setInput(input);
+        setInput(input);
         updateJavaContent();
     }
 
@@ -743,8 +743,9 @@ public class EI18NEditorPart extends MultiPageEditorPart
     private String getKeySelected() {
         if (oldPageIndex == 0) {
             Line buffer=(Line) ((IStructuredSelection) viewer.getViewer().getSelection()).getFirstElement();
-            //            if (buffer != null)
-            //                return buffer.toString();
+            if (buffer != null)
+                return buffer.toString();
+
             // TODO CME
             //        } else if (oldPageIndex == 1 && cu != null) {
             //            int offset=((ITextSelection) ((ITextEditor) getEditor(oldPageIndex)).getSelectionProvider().getSelection()).getOffset();
@@ -897,7 +898,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
         if (ext != null) {
             ext.getJavaMapping().syncFields(Collections.<String> emptyList(), Collections.singleton(key));
         }
-        //        ext.getJavaMapping().removeField(buf.toString());
+        //        ext.getJavaMapping().removeField(key);
         //        try {
         //            IDocument document=javaEditor.getDocumentProvider().getDocument(javaEditor.getEditorInput());
         //            DocumentChange change=new DocumentChange(EI18N, document);
@@ -1126,10 +1127,14 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     public String getLocale(int columnIndex) {
-        String columnProperty=(String) viewer.getViewer().getColumnProperties()[columnIndex];
-        if (ADD_COLUMN_PROPERTY.equals(columnProperty) || KEY_COLUMN_PROPERTY.equals(columnProperty))
-            return null;
-        return columnProperty;
+        Object[] columnProperties=viewer.getViewer().getColumnProperties();
+        if (columnProperties != null) {
+            String columnProperty=(String) columnProperties[columnIndex];
+            if (ADD_COLUMN_PROPERTY.equals(columnProperty) || KEY_COLUMN_PROPERTY.equals(columnProperty))
+                return null;
+            return columnProperty;
+        }
+        return null;
     }
 
     private IFile getPropertyFile() {
