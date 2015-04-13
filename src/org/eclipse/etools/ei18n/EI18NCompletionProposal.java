@@ -12,6 +12,7 @@ import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.dialogs.JavaFileSelectionDialog;
 import org.eclipse.etools.ei18n.dialogs.PropertiesFileSelectionDialog;
 import org.eclipse.etools.ei18n.util.MappingPreference;
+import org.eclipse.etools.ei18n.util.PreferencesUtil;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
@@ -195,11 +196,11 @@ public class EI18NCompletionProposal extends AbstractJavaCompletionProposal {
                     StringBuffer buf=new StringBuffer();
                     IRegion region=lineTracker.getLineInformation(lineTracker.getNumberOfLines() - 1);
                     if (!string.substring(region.getOffset(), region.getOffset() + region.getLength()).trim().isEmpty()) {
-                        buf.append('\n');
+                        buf.append(PreferencesUtil.getLineDelimiter(file));
                     }
                     buf.append(fieldName);
                     buf.append('=');
-                    buf.append(getStringLiteral());
+                    buf.append(mappingPreference.getEncoding().encode(getStringLiteral(), messagesFile));
                     messagesFile.appendContents(new ByteArrayInputStream(buf.toString().getBytes(messagesFile.getCharset())), true, true, null);
                 } finally {
                     IOUtils.closeQuietly(is);

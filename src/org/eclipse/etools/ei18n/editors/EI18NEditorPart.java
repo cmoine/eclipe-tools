@@ -3,7 +3,6 @@ package org.eclipse.etools.ei18n.editors;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -469,16 +468,9 @@ public class EI18NEditorPart extends MultiPageEditorPart
             }
 
             protected String getLine(Information info, String key, String value) {
-                Charset charset;
-                try {
-                    charset=Charset.forName(((IFile) info.file).getCharset());
-                } catch (Throwable e) {
-                    charset=Charset.defaultCharset();
-                    Activator.logError("Failed to get charset of " + info.file, e); //$NON-NLS-1$
-                }
-                byte[] encode=mappingPreference.getEncoding().encode(value, charset);
-                String str=new String(encode, charset);
-                return key + "=" + str + PreferencesUtil.getLineDelimiter(((IFile) info.file).getProject()); //$NON-NLS-1$
+                IFile file=(IFile) info.file;
+                String str=mappingPreference.getEncoding().encode(value, file);
+                return key + "=" + str + PreferencesUtil.getLineDelimiter(file); //$NON-NLS-1$
             }
 
             public Object getValue(Object element, String property) {

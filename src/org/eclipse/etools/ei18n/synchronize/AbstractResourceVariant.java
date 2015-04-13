@@ -111,7 +111,7 @@ abstract class AbstractResourceVariant implements IResourceVariant {
                 }
                 for (String line : lines) {
                     if (!line.trim().startsWith("#")) //$NON-NLS-1$
-                        buf.append(line).append(PreferencesUtil.getLineDelimiter(iFile == null ? null : iFile.getProject()));
+                        buf.append(line).append(PreferencesUtil.getLineDelimiter(iFile == null ? null : iFile));
                 }
                 return createStorage(buf.toString());
             }

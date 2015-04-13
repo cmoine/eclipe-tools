@@ -67,8 +67,7 @@ public class EI18NRenameParticipant extends RenameParticipant {
                 IRegion region=properties.getRegion(oldName);
                 TextFileChange change=new TextFileChange("Remove key " + oldName, srcFile); //$NON-NLS-1$
                 change.setEdit(new ReplaceEdit(region.getOffset(), region.getLength() + properties.getLineDelimiter(oldName).length(), getArguments()
-                        .getNewName()
-                        + "=" + StringEscapeUtils.escapeJava(properties.getProperty(oldName)) + PreferencesUtil.getLineDelimiter(srcFile.getProject()))); //$NON-NLS-1$
+                        .getNewName() + "=" + StringEscapeUtils.escapeJava(properties.getProperty(oldName)) + PreferencesUtil.getLineDelimiter(srcFile))); //$NON-NLS-1$
                 changes.add(change);
             }
         } catch (IOException e) {

@@ -101,7 +101,7 @@ public class FindUnusedPropertiesAction extends CompilationUnitAction {
 									}
 									// copyToClipboard(lines);
 									res.delete(true, null);
-                                    res.create(new ByteArrayInputStream(StringUtils.join(lines.toArray(), PreferencesUtil.getLineDelimiter(res.getProject()))
+                                    res.create(new ByteArrayInputStream(StringUtils.join(lines.toArray(), PreferencesUtil.getLineDelimiter(res))
                                             .getBytes()), true, null);
 								} catch (IOException e) {
                                     Activator.logError("Failed patching " + res, e); //$NON-NLS-1$

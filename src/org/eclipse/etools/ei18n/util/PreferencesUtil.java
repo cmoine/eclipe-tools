@@ -1,5 +1,6 @@
 package org.eclipse.etools.ei18n.util;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.Platform;
@@ -16,10 +17,10 @@ public final class PreferencesUtil {
         return getLineDelimiter(null);
     }
 
-    public static String getLineDelimiter(IProject project) {
+    public static String getLineDelimiter(IFile file) {
         String value=null;
-        if (project != null) {
-            value=getStoredValue(getPreferences(null));
+        if (file != null) {
+            value=getStoredValue(getPreferences(file.getProject()));
         }
         if (value == null) {
             value=getStoredValue(Platform.getPreferencesService().getRootNode().node(DefaultScope.SCOPE));

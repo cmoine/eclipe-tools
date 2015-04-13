@@ -77,7 +77,7 @@ public class EI18NMoveParticipant extends MoveParticipant {
                 {
                     String line=properties.getLine(key);
                     TextFileChange change=new TextFileChange("Add key " + key, dstFile); //$NON-NLS-1$
-                    change.setEdit(new InsertEdit(0, line.replaceAll("\\r|\\n", StringUtils.EMPTY) + PreferencesUtil.getLineDelimiter(dstFile.getProject()))); //$NON-NLS-1$
+                    change.setEdit(new InsertEdit(0, line.replaceAll("\\r|\\n", StringUtils.EMPTY) + PreferencesUtil.getLineDelimiter(dstFile))); //$NON-NLS-1$
                     changes.add(change);
                 }
             }
