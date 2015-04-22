@@ -1,6 +1,7 @@
 package org.eclipse.etools.ei18n.util;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.ei18n.services.BingTranslatorService;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -23,6 +25,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.ListDialog;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public abstract class TranslationCellEditor extends TextAndDialogCellEditor {
@@ -61,9 +64,10 @@ public abstract class TranslationCellEditor extends TextAndDialogCellEditor {
         final Map<String, String> toTranslate=getStringsToTranslate();
         try {
             if (toTranslate != null && !toTranslate.isEmpty()) {
-                final Set<Translation> translations=Sets.newLinkedHashSet();
+                final List<Translation> translations=Lists.newArrayListWithCapacity(toTranslate.size());
+
                 ProgressMonitorDialog dialogMonitor=new ProgressMonitorDialog(getControl().getShell());
-                //                final IFile selectedFile=getSelectedFile();
+
                 dialogMonitor.run(true, true, new IRunnableWithProgress() {
                     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                         monitor.beginTask("Checking translation...", toTranslate.size()); //$NON-NLS-1$
@@ -74,10 +78,6 @@ public abstract class TranslationCellEditor extends TextAndDialogCellEditor {
                                 String destLocale=defaultLocale(toLocale);
                                 if (!fromLocale.equals(destLocale) && StringUtils.isNotBlank(entry.getValue())) {
                                     String translate=bingTranslatorService.translate(entry.getValue(), fromLocale, destLocale);
-                                    //                                    String key=translate.toLowerCase().trim();
-                                    //                                    if (!translations.containsKey(key)) {
-                                    //                                        translations.put(key, translate);
-                                    //                                    }
                                     translations.add(new Translation(entry.getValue(), translate));
                                 }
                                 if (monitor.isCanceled())
@@ -99,10 +99,15 @@ public abstract class TranslationCellEditor extends TextAndDialogCellEditor {
                         return key;
                     }
                 });
-                if (translations.size() == 1) {
-                    return translations.iterator().next().dst;
-                } else if (!translations.isEmpty()) {
+                Set<Translation> translationSet=Sets.newHashSet(translations);
+                if (translationSet.size() == 1) {
+                    return translationSet.iterator().next().dst;
+                } else if (!translationSet.isEmpty()) {
                     ListDialog dialog=new ListDialog(getControl().getShell()) {
+                        {
+                            setDialogBoundsSettings(Activator.getDefault().getOrCreateDialogSettings(getClass()), Dialog.DIALOG_DEFAULT_BOUNDS);
+                        }
+
                         @Override
                         protected Control createDialogArea(Composite container) {
                             Control result=super.createDialogArea(container);
@@ -110,7 +115,7 @@ public abstract class TranslationCellEditor extends TextAndDialogCellEditor {
                                 @Override
                                 public void update(ViewerCell cell) {
                                     Translation t=(Translation) cell.getItem().getData();
-                                    String suffix=" - " + t.src;
+                                    String suffix=" - " + t.src; //$NON-NLS-1$
                                     cell.setText(t.dst + suffix);
                                     cell.setStyleRanges(new StyleRange[] {
                                     new StyleRange(t.dst.length(), suffix.length(), cell.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY), null,
