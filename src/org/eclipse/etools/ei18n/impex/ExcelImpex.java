@@ -82,7 +82,7 @@ public class ExcelImpex implements IImpex {
         try {
             HSSFWorkbook wb=new HSSFWorkbook();
             createSheet(iterable, wb, "main"); //$NON-NLS-1$
-            createSheet(iterable, wb, "do not edit"); //$NON-NLS-1$
+            createSheet(iterable, wb, "do not edit").protectSheet("BMEG3C7TZD"); //$NON-NLS-1$ //$NON-NLS-2$
             os=new FileOutputStream(dst);
             wb.write(os);
         } catch (Exception e) {
@@ -93,7 +93,7 @@ public class ExcelImpex implements IImpex {
         }
     }
 
-    private void createSheet(final Iterable<IFile> iterable, HSSFWorkbook wb, String sheetName) throws CoreException, IOException {
+    private HSSFSheet createSheet(final Iterable<IFile> iterable, HSSFWorkbook wb, String sheetName) throws CoreException, IOException {
         InputStream is=null;
         try {
             HSSFSheet sheet=wb.createSheet(sheetName);
@@ -101,6 +101,7 @@ public class ExcelImpex implements IImpex {
 
             int rownum=0;
             HSSFRow headerRow=sheet.createRow(rownum++);
+
             CellStyle headerStyle=wb.createCellStyle();
             Font font=wb.createFont();
             font.setBoldweight(Font.BOLDWEIGHT_BOLD);
@@ -113,7 +114,6 @@ public class ExcelImpex implements IImpex {
             cell.setCellStyle(headerStyle);
 
             // Organize file into multimap
-            //                    Multimap<IFile, IFile> files=HashMultimap.create();
             Map<Line, Line> lines=new HashMap<Line, Line>();
             Set<String> locales=Sets.newTreeSet();
             for (IFile file : iterable) {
@@ -176,6 +176,7 @@ public class ExcelImpex implements IImpex {
                         HSSFRow row=sheet.createRow(rownum++);
                         int col=STARTING_COLUMN;
                         row.createCell(col++).setCellValue(line.mainFile.getFullPath().toString() + "#" + key); //$NON-NLS-1$
+
                         row.createCell(col++).setCellValue((String) props.get(key));
                         for (Properties localeProps : propsList) {
                             HSSFCell cell2=row.createCell(col++);
@@ -186,12 +187,16 @@ public class ExcelImpex implements IImpex {
                     }
                 }
             }
-            createEmptyFormattingRule(
-                    sheet,
-                    CellRangeAddress.valueOf(CellReference.convertNumToColString(STARTING_COLUMN + 1)
-                            + "2:" + CellReference.convertNumToColString(maxCols - 1) + rownum)); //$NON-NLS-1$
+
+            if (maxCols > 0)
+                createEmptyFormattingRule(
+                        sheet,
+                        CellRangeAddress.valueOf(CellReference.convertNumToColString(STARTING_COLUMN + 1)
+                                + "2:" + CellReference.convertNumToColString(maxCols - 1) + rownum)); //$NON-NLS-1$
             for (int col=STARTING_COLUMN; col < maxCols; col++)
                 sheet.autoSizeColumn(col);
+
+            return sheet;
         } finally {
             IOUtils.closeQuietly(is);
         }
