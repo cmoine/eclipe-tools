@@ -68,7 +68,7 @@ import com.google.common.collect.Multimap;
 public class ExportWizardEi18nPage extends WizardDataTransferPage {
     private final static String STORE_DESTINATION_NAMES_ID="ExportWizardEi18nPage.STORE_DESTINATION_NAMES_ID"; //$NON-NLS-1$
 
-    private static final String FILE="file"; //$NON-NLS-1$
+    //    private static final String FILE="file"; //$NON-NLS-1$
 
     //    private static final String SELECT_DESTINATION_MESSAGE=DataTransferMessages.FileExport_selectDestinationMessage;
     private static final String SELECT_DESTINATION_TITLE=DataTransferMessages.FileExport_selectDestinationTitle;

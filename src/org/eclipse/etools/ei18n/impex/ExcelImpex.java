@@ -163,7 +163,7 @@ public class ExcelImpex implements IImpex {
                     if (localeFile != null) {
                         Matcher matcher=EI18NConstants.LOCALE_PATTERN.matcher(localeFile.getName());
                         Assert.isTrue(matcher.matches());
-                        if (locale.equals(matcher.group(1))) {
+                        if (locale.equals(matcher.group(2))) {
                             Assert.isTrue(localeProps.isEmpty());
                             is=localeFile.getContents();
                             localeProps.load(is);
@@ -193,7 +193,7 @@ public class ExcelImpex implements IImpex {
                         sheet,
                         CellRangeAddress.valueOf(CellReference.convertNumToColString(STARTING_COLUMN + 1)
                                 + "2:" + CellReference.convertNumToColString(maxCols - 1) + rownum)); //$NON-NLS-1$
-            for (int col=STARTING_COLUMN; col < maxCols; col++)
+            for (int col=STARTING_COLUMN + 1; col < maxCols; col++)
                 sheet.autoSizeColumn(col);
 
             return sheet;
