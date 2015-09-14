@@ -19,9 +19,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -135,13 +132,5 @@ public abstract class CompilationUnitAction extends CommonAction {
 		bundleName=StringUtils.removeStart(bundleName, "\""); //$NON-NLS-1$
 		bundleName=StringUtils.removeEnd(bundleName, "\""); //$NON-NLS-1$
 		return bundleName;
-	}
-
-	protected CompilationUnit parse(ICompilationUnit unit) {
-		ASTParser parser=ASTParser.newParser(AST.JLS3);
-		parser.setKind(ASTParser.K_COMPILATION_UNIT);
-		parser.setSource(unit);
-		parser.setResolveBindings(true);
-		return (CompilationUnit) parser.createAST(null); // parse
 	}
 }

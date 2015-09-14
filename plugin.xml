@@ -535,6 +535,12 @@
             id="org.eclipse.etools.ei18n.actions.ValidateNLSHandler"
             name="Validate NLS Messages">
       </command>
+      <command
+            categoryId="org.eclipse.etools.category2"
+            defaultHandler="org.eclipse.etools.visitor.VisitorGenHandler"
+            id="org.eclipse.etools.visitor.VisitorGenHandler"
+            name="Generate Visitor Pattern">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -584,6 +590,15 @@
                   commandId="org.eclipse.etools.ei18n.actions.ValidateNLSHandler"
                   icon="icons/ei18n/validate.gif"
                   label="Validate NLS Messages"
+                  style="push">
+            </command>
+            <separator
+                  name="eclipe-tools.separator4"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.etools.visitor.VisitorGenHandler"
+                  label="Generate Visitor Pattern"
                   style="push">
             </command>
          </menu>

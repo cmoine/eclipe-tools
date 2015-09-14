@@ -6,6 +6,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.RemoveMe;
+import org.eclipse.etools.util.CompilationUnitUtil;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -46,7 +47,7 @@ public class MigrateNLSAction extends CompilationUnitAction {
 						String source=cu.getBuffer().getContents();
 						Document document=new Document(source);
 
-						CompilationUnit parse=parse(cu);
+						CompilationUnit parse=CompilationUnitUtil.parse(cu);
 						final List<MethodInvocation> nodes=Lists.newArrayList();
 						final MutableObject<PackageDeclaration> pkgDecl=new MutableObject<PackageDeclaration>();
 						// MethodVisitor visitor = new MethodVisitor();
