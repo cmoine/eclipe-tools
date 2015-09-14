@@ -1,9 +1,10 @@
 package org.eclipse.etools.visitor;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -203,8 +204,20 @@ public class VisitorWizard extends Wizard {
 			IType type=cu.getTypes()[0]; 
 
 			List<String> statements=new ArrayList<String>();
-			Collection<String> collection = visitorGenWizardPage.getMultimap().get(visitorGenWizardPage.getSuperType());
+
+			Stack<String> stack=new Stack<String>();
+			stack.addAll(visitorGenWizardPage.getMultimap().get(visitorGenWizardPage.getSuperType()));
+			List<String> collection = new ArrayList<String>(stack.size());
+			while(!stack.isEmpty()) {
+				String t=stack.pop();
+				collection.add(t);
+				stack.addAll(multimap.get(t));
+			}
+			Collections.reverse(collection);
+//			Collection<String> collection = new ArrayList<>();
+//				if(multimap.containsKey(t))
 			for(String t: collection) {
+
 				String methodContent = "\tif(object instanceof " + t + ") {\n" //
 						+ "\t\t"+t+" cast=("+t+")object;\n" //
 						+ "\t\tT result=null;\n"; //
@@ -215,11 +228,12 @@ public class VisitorWizard extends Wizard {
 					methodContent+="\t\tif (result == null) result = case"+name+"(cast);\n"; //
 					t2=supertypes.get(t2);
 				}
-				methodContent += "\t\treturn null;"  //
-						+ "\t\n}";
+				methodContent += "\t\treturn result;\n"  //
+						+ "\t}";
 				statements.add(methodContent);
 			}
 			type.createMethod("public T doSwitch("+visitorGenWizardPage.getSuperType()+" object) {\n"+Joiner.on('\n').join(statements)+"\treturn null;\n}", null, true, null);
+			
 			for(String t: collection) {
 				String name=StringUtils.substringAfterLast(t, ".");
 				String methodContent = "protected T case"+name+"("+t+" object) {\n"	//
@@ -227,6 +241,7 @@ public class VisitorWizard extends Wizard {
 						+"}";
 				type.createMethod(methodContent, null, true, null);
 			}
+			
 			type.createMethod("protected T caseDefault() {\n\treturn null;\n}", null, true, null);
 			
 			IResource resource = cu.getCorrespondingResource();
