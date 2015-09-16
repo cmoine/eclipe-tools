@@ -53,7 +53,6 @@ public class VisitorWizard extends Wizard {
 		List<IResource> resources=SelectionUtils.getResources(HandlerUtil.getActiveMenuSelection(event));
 
         List<ICompilationUnit> cus=SelectionUtils.getCUs(resources);
-//        multimap = HashMultimap.create();
 
         for(ICompilationUnit cu: cus) {
         	IType[] types = cu.getTypes();
@@ -73,14 +72,11 @@ public class VisitorWizard extends Wizard {
         			}
         			superclass=hierarchy.getSuperclass(superclass);
         			if(superclass==null) {
-        				//						multimap.put(Object.class.getName(), fullyQualifiedName);
         				break;
         			}
 
         			multimap.put(superclass.getFullyQualifiedName(), fullyQualifiedName);
-        			if(supertypes.put(fullyQualifiedName, superclass.getFullyQualifiedName())!=null) {
-        				System.out.println("VisitorWizard.VisitorWizard()");
-        			}
+        			supertypes.put(fullyQualifiedName, superclass.getFullyQualifiedName());
         		}
         	}
         }
@@ -109,85 +105,6 @@ public class VisitorWizard extends Wizard {
 	}
 
 
-//	private void addParameterizedType(IType type) {
-//		try {
-//			ICompilationUnit cu = type.getCompilationUnit();
-////			CompilationUnit parse = CompilationUnitUtil.parse(cu);
-//			ASTParser parser=ASTParser.newParser(AST.JLS3);
-//			parser.setKind(ASTParser.K_COMPILATION_UNIT);
-//			parser.setSource(cu /* "public class ModelSwitch<T> {\n}".toCharArray() */);
-//			parser.setResolveBindings(true);
-//			CompilationUnit parse = (CompilationUnit) parser.createAST(null); // parse
-//			
-//			final AST ast = parse.getAST();
-//			
-//			final TypeDeclaration[] decl=new TypeDeclaration[1];
-//			parse.accept(new ASTVisitor() {
-//				@Override
-//				public boolean visit(TypeDeclaration node) {
-//					decl[0]=node;
-////					node.resolveBinding().getTypeParameters()
-////					TypeParameter typeParameter = ast.newTypeParameter();
-////					typeParameter.setName(ast.newSimpleName("T"));
-////					node.typeParameters().add(typeParameter);
-//					// [ChildProperty[org.eclipse.jdt.core.dom.TypeDeclaration,javadoc], ChildListProperty[org.eclipse.jdt.core.dom.TypeDeclaration,modifiers], 
-//					// SimpleProperty[org.eclipse.jdt.core.dom.TypeDeclaration,interface], ChildProperty[org.eclipse.jdt.core.dom.TypeDeclaration,name],
-//					// ChildListProperty[org.eclipse.jdt.core.dom.TypeDeclaration,typeParameters], ChildProperty[org.eclipse.jdt.core.dom.TypeDeclaration,superclassType],
-//					// ChildListProperty[org.eclipse.jdt.core.dom.TypeDeclaration,superInterfaceTypes], ChildListProperty[org.eclipse.jdt.core.dom.TypeDeclaration,bodyDeclarations]]
-////					node.getStructuralProperty(ParameterizedType.TYPE_ARGUMENTS_PROPERTY)getProperty("typeParameters")
-//					return super.visit(node);
-//				}
-//				
-//				@Override
-//				public boolean visit(ParameterizedType node) {
-//					// TODO Auto-generated method stub
-//					return super.visit(node);
-//				}
-//				
-////				public boolean visit(org.eclipse.jdt.core.dom.TypeDeclarationStatement node) {
-//////					node.set
-////					return super.visit(node);
-////				}
-//			});
-//			
-////			ast.newTy
-////			ParameterizedType parameterizedType = ast.newParameterizedType(ast.newTySimpleType(ast.newName("T")));
-////			TypeDeclaration typeDeclaration = ast.newTypeDeclaration();
-////			typeDeclaration.
-//			
-//			
-////			decl[0].set
-////			rewrite.replace(decl[0], parameterizedType, null);
-//			
-////			parameterizedType.setType(type);
-//			
-//			ASTRewrite rewrite = ASTRewrite.create(ast);
-//			TypeParameter typeParameter = ast.newTypeParameter();
-//			typeParameter.setName(ast.newSimpleName("T"));
-//			rewrite.getListRewrite(decl[0], TypeDeclaration.TYPE_PARAMETERS_PROPERTY).insertLast(typeParameter, null);// , typeParameter, null);
-//			
-//			String source = type.getSource();
-//			Document document = new Document(source);
-//			
-//			TextEdit edits=rewrite.rewriteAST(document, cu.getJavaProject().getOptions(true));
-//
-//////			decl[0].get
-//			
-////			ParameterizedType parameterizedType = ast.newParameterizedType(ast.newSimpleType(ast.newName("T")));
-//
-////			rewrite.getListRewrite(parameterizedType, ParameterizedType.TYPE_ARGUMENTS_PROPERTY).insertLast(typeParameter, null);// , typeParameter, null);
-////			rewrite.replace(decl[0], parameterizedType, null);
-//			
-//			edits.apply(document);
-//			String newSource=document.get();
-//
-//			// update of the compilation unit
-//			cu.getBuffer().setContents(newSource);
-//		} catch (Exception e) {
-//			throw Throwables.propagate(e);
-//		}
-//	}
-	
 	@Override
 	public boolean performFinish() {
 		try {
@@ -228,6 +145,7 @@ public class VisitorWizard extends Wizard {
 					methodContent+="\t\tif (result == null) result = case"+name+"(cast);\n"; //
 					t2=supertypes.get(t2);
 				}
+				methodContent+="\t\tif (result == null) result = caseDefault(cast);\n";
 				methodContent += "\t\treturn result;\n"  //
 						+ "\t}";
 				statements.add(methodContent);
@@ -242,7 +160,7 @@ public class VisitorWizard extends Wizard {
 				type.createMethod(methodContent, null, true, null);
 			}
 			
-			type.createMethod("protected T caseDefault() {\n\treturn null;\n}", null, true, null);
+			type.createMethod("protected T caseDefault("+visitorGenWizardPage.getSuperType()+" object) {\n\treturn null;\n}", null, true, null);
 			
 			IResource resource = cu.getCorrespondingResource();
 			if (resource != null) {
