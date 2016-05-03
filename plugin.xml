@@ -541,6 +541,12 @@
             id="org.eclipse.etools.visitor.VisitorGenHandler"
             name="Generate Visitor Pattern">
       </command>
+      <command
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.jpa.EcoreGeneration"
+            id="org.eclipse.etools.jpa.EcoreGeneration"
+            name="JPA -&gt; Ecore">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -599,6 +605,15 @@
             <command
                   commandId="org.eclipse.etools.visitor.VisitorGenHandler"
                   label="Generate Visitor Pattern"
+                  style="push">
+            </command>
+            <separator
+                  name="eclipe-tools.separator5"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.etools.jpa.EcoreGeneration"
+                  label="JPA -&gt; Ecore"
                   style="push">
             </command>
          </menu>
