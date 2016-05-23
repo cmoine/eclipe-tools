@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.eclipse.etools;singleton:=true
 Bundle-Version: 1.0.7.qualifier
 Bundle-Activator: org.eclipse.etools.Activator
 Bundle-Vendor: Christophe Moine
+Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.team.ui,
