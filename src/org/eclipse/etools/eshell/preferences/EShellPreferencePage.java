@@ -19,7 +19,6 @@ public class EShellPreferencePage extends FieldEditorPreferencePage implements I
 
     @Override
     protected void createFieldEditors() {
-        //        addField(new StringFieldEditor(EXPLORE_COMMAND, "Explore command:", getFieldEditorParent()));
         addField(new StringFieldEditor(OPEN_COMMAND, "Open command line:", getFieldEditorParent()));
     }
 }

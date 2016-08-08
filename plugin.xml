@@ -163,6 +163,9 @@
       <initializer
             class="org.eclipse.etools.eshell.preferences.EShellPreferenceInitializer">
       </initializer>
+      <initializer
+            class="org.eclipse.etools.EtoolsPrefereneInitializer">
+      </initializer>
    </extension>
    <!-- <extension
          point="org.eclipse.jdt.ui.quickFixProcessors">
@@ -674,6 +677,7 @@
             class="org.eclipse.etools.EToolsTemplateVariableResolver"
             contextTypeId="java-statements"
             description="ETOOLS"
+            name="line_number"
             type="line_number">
       </resolver>
       <template
@@ -770,6 +774,22 @@ private ${enclosing_type} () {
 }
          </pattern>
       </template>
+      <resolver
+            class="org.eclipse.etools.EToolsTemplateVariableResolver"
+            contextTypeId="java-members"
+            name="logger"
+            type="logger">
+      </resolver>
+      <template
+            autoinsert="true"
+            contextTypeId="java-members"
+            description="ETOOLS"
+            id="eclipe-tools.template10"
+            name="logger">
+         <pattern>
+            public static final ${logger} LOG=${logger}.getLogger(${enclosing_type}.class);
+         </pattern>
+      </template>
    </extension>
 
    <!-- ***************************************************************
@@ -859,7 +879,7 @@ private ${enclosing_type} () {
       <key
             commandId="org.springsource.ide.eclipse.quicksearch.commands.quicksearchCommand"
             contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+Q M1+S"
+            sequence="M1+ALT+F"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
       </key>
    </extension>
@@ -868,6 +888,7 @@ private ${enclosing_type} () {
 	      point = "org.eclipse.ui.preferencePages">
 	       <page id="org.springsource.ide.eclipse.commons.quicksearch.PreferencesPage"
 		        class="org.springsource.ide.eclipse.commons.quicksearch.ui.QuickSearchPreferencesPage"
+	            category="org.eclipse.etools.EtoolsPreferencePage"
 	            name="Quick Search">
 	       </page>
 	</extension>

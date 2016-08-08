@@ -58,9 +58,10 @@ public class EShellCommand extends AbstractHandler implements EShellPreferencesC
             return null;
         }
 
-        Object selectedObject=((IStructuredSelection) selection).getFirstElement();
-        IResource item=(IResource) org.eclipse.ui.internal.util.Util.getAdapter(selectedObject, IResource.class);
-        return item;
+//        Object selectedObject=((IStructuredSelection) selection).getFirstElement();
+//        IResource item=(IResource) org.eclipse.ui.internal.util.Util.getAdapter(selectedObject, IResource.class);
+//        return item;
+        return null;
     }
 
     private IResource getEditorInputResource(ExecutionEvent event) {
@@ -72,7 +73,7 @@ public class EShellCommand extends AbstractHandler implements EShellPreferencesC
         if (input instanceof IFileEditorInput) {
             return ((IFileEditorInput) input).getFile();
         }
-        return (IResource) input.getAdapter(IResource.class);
+        return input.getAdapter(IResource.class);
     }
 
     private File getSystemExplorerPath(IResource resource) throws IOException {
