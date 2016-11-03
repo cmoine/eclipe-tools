@@ -1,4 +1,4 @@
-package org.eclipse.etools;
+package org.eclipse.etools.util;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.etools.Activator;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;

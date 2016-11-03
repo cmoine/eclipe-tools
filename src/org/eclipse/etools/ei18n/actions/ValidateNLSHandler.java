@@ -34,11 +34,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.etools.Activator;
-import org.eclipse.etools.SelectionUtils;
 import org.eclipse.etools.codeanalysis.CodeAnalysis;
 import org.eclipse.etools.ei18n.util.EI18NConstants;
 import org.eclipse.etools.ei18n.util.MappingPreference;
 import org.eclipse.etools.search.EI18NTextSearchResult;
+import org.eclipse.etools.util.SelectionUtils;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaModelMarker;
@@ -113,7 +113,7 @@ public class ValidateNLSHandler extends AbstractHandler implements IHandler {
                             // Find markers
                             try {
                                 DefaultLineTracker tracker=new DefaultLineTracker();
-                                String content=FileUtils.readFileToString(org.eclipse.etools.FileUtils.getResource(file), file.getCharset());
+                                String content=FileUtils.readFileToString(org.eclipse.etools.util.FileUtils.getResource(file), file.getCharset());
                                 tracker.set(content);
                                 for (IMarker marker : file.findMarkers("org.eclipse.jdt.core.problem", false, IResource.DEPTH_ZERO)) { //$NON-NLS-1$
                                     if (((Integer) marker.getAttribute(IJavaModelMarker.ID)).intValue() == IProblem.NonExternalizedStringLiteral) {

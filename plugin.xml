@@ -78,15 +78,23 @@
    <extension
          point="org.eclipse.ui.views">
       <category
-            id="org.eclipse.etools.ei18n"
-            name="EI18N">
+            id="org.eclipse.etools"
+            name="ETools">
       </category>
       <view
-            category="org.eclipse.etools.ei18n"
+            category="org.eclipse.etools"
             class="org.eclipse.etools.ei18n.views.EI18NProblemView"
             icon="icons/ei18n/localizedProperties.png"
             id="org.eclipse.etools.ei18n.views.EI18NProblemView"
             name="EI18N Problems"
+            restorable="true">
+      </view>
+      <view
+            category="org.eclipse.etools"
+            class="org.eclipse.etools.icons.IconsSearchView"
+            icon="icons/icons/part.png"
+            id="org.eclipse.etools.icons.IconsSearchView"
+            name="Icon Browser"
             restorable="true">
       </view>
    </extension>
@@ -549,6 +557,12 @@
             defaultHandler="org.eclipse.etools.jpa.EcoreGeneration"
             id="org.eclipse.etools.jpa.EcoreGeneration"
             name="JPA -&gt; Ecore">
+      </command>
+      <command
+            categoryId="org.eclipse.etools.category1"
+            defaultHandler="org.eclipse.etools.jar.SearchAndAddJar"
+            id="org.eclipse.etools.jar.SearchAndAddJar"
+            name="Search &amp; Add JAR to Build Path">
       </command>
    </extension>
    <extension

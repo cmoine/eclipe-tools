@@ -20,5 +20,10 @@ public class EShellPreferencePage extends FieldEditorPreferencePage implements I
     @Override
     protected void createFieldEditors() {
         addField(new StringFieldEditor(OPEN_COMMAND, "Open command line:", getFieldEditorParent()));
+        
+//        Group group=new Group(getFieldEditorParent(), SWT.NONE);
+//        group.setText("Optional command");
+//        addField(new StringFieldEditor(OPTIONAL_COMMAND_NAME, "Command name:", group));
+//        addField(new StringFieldEditor(OPTIONAL_COMMAND, "Command line:", group));
     }
 }

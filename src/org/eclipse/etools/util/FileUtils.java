@@ -1,4 +1,4 @@
-package org.eclipse.etools;
+package org.eclipse.etools.util;
 
 import java.io.File;
 
