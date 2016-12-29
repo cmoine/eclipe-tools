@@ -551,7 +551,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
                 IEditorPart part=getEditor(i);
                 if (part instanceof CompilationUnitEditor) {
                     if (part.isDirty()) {
-                        IFile adapter=(IFile) part.getEditorInput().getAdapter(IFile.class);
+                        IFile adapter=part.getEditorInput().getAdapter(IFile.class);
                         if (MessageDialog.openQuestion(getShell(), getShell().getText(),
                                 format("Would you like to save ''{0}''?", adapter.getFullPath().toString()))) {
                             part.doSave(new NullProgressMonitor());
@@ -1130,7 +1130,7 @@ public class EI18NEditorPart extends MultiPageEditorPart
     }
 
     private IFile getPropertyFile() {
-        return (IFile) getEditorInput().getAdapter(IFile.class);
+        return getEditorInput().getAdapter(IFile.class);
     }
 
     protected void createLocale(String locale) {

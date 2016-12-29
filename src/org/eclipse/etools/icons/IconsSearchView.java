@@ -1,87 +1,101 @@
 package org.eclipse.etools.icons;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.etools.Activator;
 import org.eclipse.etools.util.ArrayTreeContentProvider;
+import org.eclipse.etools.util.EToolsImage;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.TreeViewerRow;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.dialogs.FilteredTree;
-import org.eclipse.ui.dialogs.PatternFilter;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.Bundle;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 
 public class IconsSearchView extends ViewPart {
-	private FilteredTree tree;
+	private static final int LIMIT = 100;
 	
-	private Set<String> KNOWN_EXTENSIONS=ImmutableSet.of("png","gif","jpg", "jpeg", "bmp");
+	private Set<String> KNOWN_EXTENSIONS=ImmutableSet.of("png", //$NON-NLS-1$
+			"gif", //$NON-NLS-1$
+			"jpg",  //$NON-NLS-1$
+			"jpeg",  //$NON-NLS-1$
+			"bmp"); //$NON-NLS-1$
+
+	private static final ImageLoader LOADER=new ImageLoader();
+	private List<Entry<Bundle, URL>> all=new ArrayList<Entry<Bundle, URL>>();
+	private List<InputEntry> input=new ArrayList<InputEntry>(LIMIT);
 
 	private TreeViewer viewer;
+	private Tree tree;
+
+	private Text filterText;
 	
-	private static final class Entry {
+	private static final class InputEntry {
 		private URL url;
 		private Bundle bundle;
+		private Optional<Image> image;
+		private int remaining;
 
-		public Entry(URL url, Bundle bundle) {
+		public InputEntry(Bundle bundle, URL url) {
 			this.url = url;
 			this.bundle = bundle;
 		}
 		
-		@Override
-		public String toString() {
-			return bundle.getSymbolicName()+url.getPath();
+		public InputEntry(int remaining) {
+			this.remaining = remaining;
 		}
-	}
+		
+		public String getValue() {
+			return bundle==null ? remaining + " more..." //$NON-NLS-1$
+					: bundle.getSymbolicName()+url.getPath();
+		}
 
-	@Override
-	public void createPartControl(Composite parent) {
-		PatternFilter filter = new PatternFilter();
-		tree = new FilteredTree(parent, SWT.FULL_SELECTION, filter, true);
-		viewer = tree.getViewer();
-//		viewer.setContentProvider(new ILazyContentProvider() {
-//			public void updateElement(int index) {
-//				// TODO Auto-generated method stub
-//				System.out.println(
-//						"IconsSearchView.createPartControl(...).new ILazyContentProvider() {...}.updateElement()");
-//				
-//			}
-//		});
-		new TreeViewerRowVisibilityStateSupport(viewer).addItemStateListener(new ViewerRowStateChangeListener() {
-			private ImageLoader loader=new ImageLoader();
-			
-			public void itemStateChangedListener(ViewerRowStateChangedEvent event) {
-				for(TreeViewerRow row: event.itemsHidden) {
-					if(!event.itemsVisible.contains(row)) {
-						Image image = row.getImage(0);
-						if(image!=null)
-							image.dispose();
-					}
-				}
-				for(TreeViewerRow row: event.itemsVisible) {
-					Entry entry=(Entry) row.getElement();
-					URL url=entry.url;
+		public Image getOrCreateImage() {
+			if(image==null) {
+				if(url!=null) {
 					InputStream is=null;
 					try {
 						is=url.openStream();
-						ImageData[] data = loader.load(is);
+						ImageData[] data = LOADER.load(is);
 						if(data.length>0) {
-							row.setImage(0, new Image(Display.getDefault(), data[0]));
+							image=Optional.of(new Image(Display.getDefault(), data[0]));
 						}
 					} catch(Exception e) {
 						Activator.logError("Failed loading image from "+url, e); //$NON-NLS-1$
@@ -89,50 +103,111 @@ public class IconsSearchView extends ViewPart {
 						IOUtils.closeQuietly(is);
 					}
 				}
+				if(image==null)
+					image=Optional.absent();
 			}
-		});
-		viewer.setContentProvider(new ArrayTreeContentProvider());
-		viewer.setLabelProvider(new LabelProvider() /* {
-			private Map<URL, Image> images=Maps.newHashMap();
-			private ImageLoader loader=new ImageLoader();
-			
-//			@Override
-//			public String getText(Object element) {
-//				// TODO Auto-generated method stub
-//				return super.getText(element);
-//			}
+			return image.orNull();
+		}
+	}
 
-//			@Override
-//			public Image getImage(Object element) {
-//				if(!images.containsKey(element)) {
-//					URL url=((Entry) element).url;
-//					InputStream is=null;
-//					try {
-//						is=url.openStream();
-//						ImageData[] data = loader.load(is);
-//						if(data.length>0) {
-//							images.put(url, new Image(Display.getDefault(), data[0]));
-//						}
-//					} catch(Exception e) {
-//						Activator.logError("Failed loading image from "+url, e); //$NON-NLS-1$
-//					} finally {
-//						IOUtils.closeQuietly(is);
-//					}
-//				}
-//				return images.get(element);
-//			}
-		}*/);
-		List<Entry> input=new ArrayList<Entry>();
+	@Override
+	public void createPartControl(Composite parent) {
 		for(Bundle bundle: Activator.getDefault().getBundle().getBundleContext().getBundles()) {
 			for(URL url: Collections.list(bundle.findEntries("/", null, true))) {
 				String ext = StringUtils.substringAfterLast(url.toString(), ".");
 				if(KNOWN_EXTENSIONS.contains(ext)) {
-					input.add(new Entry(url, bundle));
+					all.add(Maps.immutableEntry(bundle, url));
 				}
 			}
 		}
-		viewer.setInput(input);
+
+		Composite composite = new Composite(parent, SWT.NONE);
+        composite.setLayout(new GridLayout(1, false));
+        filterText=new Text(composite, SWT.BORDER);
+        filterText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        filterText.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent e) {
+				updateInput();
+			}
+		});
+        
+		viewer = new TreeViewer(composite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+		tree=viewer.getTree();
+		tree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		viewer.setContentProvider(new ArrayTreeContentProvider());
+		viewer.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(Object element) {
+				return ((InputEntry) element).getValue();
+			}
+
+			@Override
+			public Image getImage(Object element) {
+				return ((InputEntry) element).getOrCreateImage();
+			}
+		});
+		Menu menu=new Menu(tree);
+		final MenuItem exportItem=new MenuItem(menu, SWT.NONE);
+		exportItem.setText("Export..."); //$NON-NLS-1$
+		exportItem.setImage(EToolsImage.ICONS_EXPORT_16.getImage());
+		exportItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog dialog=new FileDialog(tree.getShell(), SWT.SAVE);
+				InputEntry elt=(InputEntry) viewer.getStructuredSelection().getFirstElement();
+				dialog.setFileName(FilenameUtils.getName(elt.url.getPath()));
+				String filepath = dialog.open();
+				if(filepath!=null) {
+					File file=new File(filepath);
+					InputStream is=null;
+					try {
+						is=elt.url.openStream();
+						FileUtils.copyInputStreamToFile(is, file);
+						for(IFile f: ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toURI())) {
+							try {
+								f.refreshLocal(IFile.DEPTH_ZERO, new NullProgressMonitor());
+							} catch (CoreException e1) {
+								Activator.logWarning("Failed refreshing file "+f, e1); //$NON-NLS-1$
+							}
+						}
+					} catch (IOException e1) {
+						Activator.logError("Failed loading image for export", e1); //$NON-NLS-1$
+					} finally {
+						IOUtils.closeQuietly(is);
+					}
+				}
+			}
+		});
+		menu.addListener(SWT.Show, new Listener() {
+			public void handleEvent(Event event) {
+				exportItem.setEnabled(viewer.getStructuredSelection().size()==1 && ((InputEntry)viewer.getStructuredSelection().getFirstElement()).bundle!=null);
+			}
+		});
+		tree.setMenu(menu);
+		
+		updateInput();
 		getViewSite().getActionBars().getStatusLineManager().setMessage(input.size() + " images loaded");
+	}
+
+	private void updateInput() {
+		for(InputEntry entry: input) {
+			if(entry.image!=null && entry.image.isPresent())
+				entry.image.get().dispose();
+		}
+		input.clear();
+		String search=filterText.getText();
+		for(Entry<Bundle, URL> entry: all) {
+			if(FilenameUtils.getBaseName(entry.getValue().getPath()).contains(search)) {
+				input.add(new InputEntry(entry.getKey(), entry.getValue()));
+				if(input.size()>=LIMIT) {
+					input.add(new InputEntry(all.size()-LIMIT));
+					break;
+				}				
+			}
+		}
+		
+		viewer.setInput(input);
+
 	}
 
 	@Override

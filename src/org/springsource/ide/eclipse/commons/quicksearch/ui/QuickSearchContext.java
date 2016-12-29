@@ -104,7 +104,7 @@ public class QuickSearchContext {
 						try {
 							IEditorInput input = editor.getEditorInput();
 							if (input!=null) {
-								IFile file = input.getAdapter(IFile.class);
+								IFile file = (IFile) input.getAdapter(IFile.class);
 								if (file != null) {
 								    files.add(file);
 								}
@@ -138,7 +138,7 @@ public class QuickSearchContext {
 			if (editor!=null) {
 				IEditorInput input = editor.getEditorInput();
 				if (input!=null) {
-					return input.getAdapter(IFile.class);
+					return (IFile) input.getAdapter(IFile.class);
 				}
 			}
 		}
@@ -161,7 +161,7 @@ public class QuickSearchContext {
 						resources.add((IResource) e);
 					} else if (e instanceof IAdaptable) {
 						IAdaptable ae = (IAdaptable) e;
-						IResource r = ae.getAdapter(IResource.class);
+						IResource r = (IResource) ae.getAdapter(IResource.class);
 						if (r!=null) {
 							resources.add(r);
 						}
