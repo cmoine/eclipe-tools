@@ -725,11 +725,10 @@
             id="eclipe-tools.template3"
             name="event_loop">
          <pattern>
-            Display.getDefault().asyncExec(new Runnable() {
-	public void run() {
-		${cursor}
-	}
-});
+            while (!${shell}.isDisposed()) {
+    if (!${shell}.getDisplay().readAndDispatch())
+        ${shell}.getDisplay().sleep();
+}
          </pattern>
       </template>
       <template
