@@ -12,6 +12,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.etools.Activator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.text.ITextSelection;
@@ -58,7 +60,7 @@ public class SearchJar extends AbstractHandler {
 				initialFqClassName=((ITextSelection)activeMenuSelection).getText();
 			if(StringUtils.isEmpty(initialFqClassName))
 				initialFqClassName=dialogSettings.get(LAST_CLASS);
-			InputDialog dialog2=new InputDialog(shell, shell.getText(), "Enter the full qualified name of the class to search:", initialFqClassName, null);
+			InputDialog dialog2=new InputDialog(shell, shell.getText(), "Enter the name of the class to search:", initialFqClassName, null);
 			if(dialog2.open()==Window.OK) {
 				dialogSettings.put(LAST_CLASS, dialog2.getValue());
 				final String fqClassName=dialog2.getValue().replace('.', '/')+".class";
@@ -81,9 +83,23 @@ public class SearchJar extends AbstractHandler {
 								File file = iterator.next();
 								try {
 									JarFile jarFile=new JarFile(file);
-									if(jarFile.getEntry(fqClassName)==null) {
-										iterator.remove();
-									}
+									monitor.subTask(jarFile.getName());
+//									if(fqClassName.contains("/")) {
+//										if(jarFile.getEntry(fqClassName)==null) {
+//											iterator.remove();
+//										}
+//									} else {
+										// Not a fully qualified name :(
+										boolean found=false;
+										for(JarEntry entry: Collections.list(jarFile.entries())) {
+											if(entry.getName().endsWith(fqClassName)) {
+												found=true;
+												break;
+											}
+										}
+										if(!found)
+											iterator.remove();
+//									}
 									jarFile.close();
 								} catch (IOException e) {
 									Activator.logError("", e); //$NON-NLS-1$
@@ -93,16 +109,20 @@ public class SearchJar extends AbstractHandler {
 							monitor.done();
 						}
 					});
-					ListDialog dialog4 = new ListDialog(shell);
-					dialog4.setAddCancelButton(false);
-					dialog4.setTitle(shell.getText());
-					dialog4.setMessage("List of matching Jar file(s):");
-					dialog4.setContentProvider(ArrayContentProvider.getInstance());
-					dialog4.setLabelProvider(new LabelProvider());
-					if(!candidates.isEmpty())
+					if(candidates.isEmpty()) {
+						MessageDialog.openInformation(shell, shell.getText(), "No candidate found :(");
+					} else {
+						ListDialog dialog4 = new ListDialog(shell);
+						dialog4.setAddCancelButton(false);
+						dialog4.setTitle(shell.getText());
+						dialog4.setMessage("List of matching Jar file(s):");
+						dialog4.setContentProvider(ArrayContentProvider.getInstance());
+						dialog4.setLabelProvider(new LabelProvider());
+//						if(!candidates.isEmpty())
 						dialog4.setInitialElementSelections(Collections.singletonList(candidates.get(0)));
-					dialog4.setInput(candidates);
-					dialog4.open();
+						dialog4.setInput(candidates);
+						dialog4.open();
+					}
 //					if(dialog4.open()==Window.OK && dialog4.getResult().length>0) {
 //						File jarFile = (File) dialog4.getResult()[0];
 //						FolderSelectionDialog dialog5=new FolderSelectionDialog(shell, new WorkbenchLabelProvider(), new WorkbenchContentProvider());
@@ -129,8 +149,8 @@ public class SearchJar extends AbstractHandler {
 //							}
 //						}
 //					}
-				} catch (Exception e) {
-					Activator.logError("Internal error", e); //$NON-NLS-1$
+				} catch (Throwable t) {
+					Activator.logError("Internal error", t); //$NON-NLS-1$
 				}
 			}
 		}
