@@ -560,9 +560,9 @@
       </command>
       <command
             categoryId="org.eclipse.etools.category1"
-            defaultHandler="org.eclipse.etools.jar.SearchAndAddJar"
-            id="org.eclipse.etools.jar.SearchAndAddJar"
-            name="Search &amp; Add JAR to Build Path">
+            defaultHandler="org.eclipse.etools.jar.SearchJar"
+            id="org.eclipse.etools.jar.SearchJar"
+            name="Search JAR...">
       </command>
    </extension>
    <extension
@@ -631,6 +631,15 @@
             <command
                   commandId="org.eclipse.etools.jpa.EcoreGeneration"
                   label="JPA -&gt; Ecore"
+                  style="push">
+            </command>
+            <separator
+                  name="eclipe-tools.separator6"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.etools.jar.SearchJar"
+                  label="Search JAR..."
                   style="push">
             </command>
          </menu>
