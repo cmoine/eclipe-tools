@@ -132,15 +132,22 @@
    <extension
          point="org.eclipse.ui.exportWizards">
       <category
-            id="org.eclipse.etools.ei18n.category.ei18n"
+            id="org.eclipse.etools"
             name="Etools">
       </category>
       <wizard
-            category="org.eclipse.etools.ei18n.category.ei18n"
+            category="org.eclipse.etools"
             class="org.eclipse.etools.ei18n.wizards.ExportWizardEi18n"
             icon="icons/ei18n/localizedProperties.png"
             id="org.eclipse.etools.ei18n.wizard.export"
             name="Export Translated Messages">
+      </wizard>
+      <wizard
+            category="org.eclipse.etools"
+            class="org.eclipse.etools.jar.JarsExportWizard"
+            icon="platform:/plugin/org.eclipse.jdt.ui/icons/full/etool16/exportjar_wiz.png"
+            id="org.eclipse.etools.jar.JarsExportWizard"
+            name="Export JARs">
       </wizard>
    </extension>
    <extension
@@ -659,6 +666,15 @@
           </visibleWhen>
          </command>
       </menuContribution>
+         <!-- <menuContribution
+               allPopups="false"
+               locationURI="toolbar:org.eclipse.debug.ui.BreakpointView?after=additions">
+            <command
+                  commandId="org.eclipse.etools.debug.CustomDebugHandler"
+                  label="CAB"
+                  style="push">
+            </command>
+         </menuContribution> -->
    </extension>
    <!-- <extension
          point="org.eclipse.core.expressions.propertyTesters">
@@ -828,6 +844,11 @@ private ${enclosing_type} () {
             categoryId="org.springsource.ide.eclipse.quicksearch.commands.category"
             id="org.springsource.ide.eclipse.quicksearch.commands.quicksearchCommand">
       </command>
+      <!-- <command
+            defaultHandler="org.eclipse.etools.debug.CustomDebugHandler"
+            id="org.eclipse.etools.debug.CustomDebugHandler"
+            name="Advanced Add Breakpoint">
+      </command> -->
    </extension>
 
    <!-- it seems that using the new and recommended way of contributing entries to existing menus

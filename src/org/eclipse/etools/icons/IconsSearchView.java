@@ -1,5 +1,8 @@
 package org.eclipse.etools.icons;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -24,6 +29,7 @@ import org.eclipse.etools.util.EToolsImage;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -42,6 +48,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.internal.WorkbenchMessages;
 import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.Bundle;
 
@@ -66,6 +73,8 @@ public class IconsSearchView extends ViewPart {
 	private Tree tree;
 
 	private Text filterText;
+
+	private Clipboard clipboard;
 	
 	private static final class InputEntry {
 		private URL url;
@@ -95,6 +104,8 @@ public class IconsSearchView extends ViewPart {
 						is=url.openStream();
 						ImageData[] data = LOADER.load(is);
 						if(data.length>0) {
+							if(data[0].width>16 || data[0].height>16)
+								data[0]=data[0].scaledTo(16, 16);
 							image=Optional.of(new Image(Display.getDefault(), data[0]));
 						}
 					} catch(Exception e) {
@@ -147,6 +158,38 @@ public class IconsSearchView extends ViewPart {
 			}
 		});
 		Menu menu=new Menu(tree);
+		final MenuItem copyItem=new MenuItem(menu, SWT.NONE);
+		clipboard = new Clipboard(parent.getDisplay());
+		copyItem.setText(WorkbenchMessages.Workbench_copy);
+		copyItem.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				InputEntry elt=(InputEntry) viewer.getStructuredSelection().getFirstElement();
+				InputStream is=null;
+				try {
+					is=elt.url.openStream();
+//					ImageLoader loader=new ImageLoader();
+//					loader.load(is);
+//					ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//					loader.save(stream, SWT.IMAGE_BMP);
+//					loader.load(stream)
+//					Image img=new Image(e.display, loader.data[0]);
+//					clipboard.setContents(new Object[]{img.getImageData()}, new Transfer[]{ImageTransfer.getInstance()});
+					Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new TransferableImage(ImageIO.read(is)), new ClipboardOwner() {
+						public void lostOwnership(java.awt.datatransfer.Clipboard clipboard, Transferable contents) {
+							// TODO Auto-generated method stub
+							
+						}
+					});
+//					img.dispose();
+				} catch (IOException e1) {
+					Activator.logError("Failed loading image for export", e1); //$NON-NLS-1$
+				} finally {
+					IOUtils.closeQuietly(is);
+				}
+			}
+		});
+
 		final MenuItem exportItem=new MenuItem(menu, SWT.NONE);
 		exportItem.setText("Export..."); //$NON-NLS-1$
 		exportItem.setImage(EToolsImage.ICONS_EXPORT_16.getImage());
@@ -180,13 +223,21 @@ public class IconsSearchView extends ViewPart {
 		});
 		menu.addListener(SWT.Show, new Listener() {
 			public void handleEvent(Event event) {
-				exportItem.setEnabled(viewer.getStructuredSelection().size()==1 && ((InputEntry)viewer.getStructuredSelection().getFirstElement()).bundle!=null);
+				boolean enabled = viewer.getStructuredSelection().size()==1 && ((InputEntry)viewer.getStructuredSelection().getFirstElement()).bundle!=null;
+				copyItem.setEnabled(enabled);
+				exportItem.setEnabled(enabled);
 			}
 		});
 		tree.setMenu(menu);
 		
 		updateInput();
 		getViewSite().getActionBars().getStatusLineManager().setMessage(input.size() + " images loaded");
+	}
+	
+	@Override
+	public void dispose() {
+		super.dispose();
+		clipboard.dispose();
 	}
 
 	private void updateInput() {

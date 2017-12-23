@@ -31,6 +31,10 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ListDialog;
@@ -41,12 +45,13 @@ import com.google.common.collect.Lists;
 public class SearchJar extends AbstractHandler {
 	private static final String LAST_PATH="last.path"; //$NON-NLS-1$
 	private static final String LAST_CLASS="last.class"; //$NON-NLS-1$
+	private static final String LAST_SOURCE="last.source"; //$NON-NLS-1$
 //	private static final String LAST_FOLDER="last.folder";
 	
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		Shell shell = HandlerUtil.getActiveShellChecked(event);
 		DirectoryDialog dialog=new DirectoryDialog(shell);
-		IDialogSettings dialogSettings=Activator.getDefault().getOrCreateDialogSettings(SearchJar.class);
+		final IDialogSettings dialogSettings=Activator.getDefault().getOrCreateDialogSettings(SearchJar.class);
 		String lastPath = dialogSettings.get(LAST_PATH);
 		if(StringUtils.isNotEmpty(lastPath))
 			dialog.setFilterPath(lastPath);
@@ -60,17 +65,38 @@ public class SearchJar extends AbstractHandler {
 				initialFqClassName=((ITextSelection)activeMenuSelection).getText();
 			if(StringUtils.isEmpty(initialFqClassName))
 				initialFqClassName=dialogSettings.get(LAST_CLASS);
-			InputDialog dialog2=new InputDialog(shell, shell.getText(), "Enter the name of the class to search:", initialFqClassName, null);
+			final boolean[] sourceCode=new boolean[]{false};
+			InputDialog dialog2=new InputDialog(shell, shell.getText(), "Enter the name of the class to search:", initialFqClassName, null) {
+				private Button sourceCodeButton;
+
+				@Override
+				protected Control createDialogArea(Composite parent) {
+					Composite composite = (Composite) super.createDialogArea(parent);
+					sourceCodeButton=new Button(composite, SWT.CHECK);
+					sourceCodeButton.setText("Find source code");
+					sourceCodeButton.setSelection(dialogSettings.getBoolean(LAST_SOURCE));
+					return composite;
+				}
+				
+				@Override
+				public boolean close() {
+					sourceCode[0]=sourceCodeButton.getSelection();
+					return super.close();
+				}
+			};
 			if(dialog2.open()==Window.OK) {
+				dialogSettings.put(LAST_SOURCE, sourceCode[0]);
 				dialogSettings.put(LAST_CLASS, dialog2.getValue());
-				final String fqClassName=dialog2.getValue().replace('.', '/')+".class";
+				final String fqClassName=dialog2.getValue().replace('.', '/')+(sourceCode[0]?".java":".class");
 				try {
 					final List<File> candidates=Lists.newArrayList();
 					Files.walkFileTree(Paths.get(newPath), new SimpleFileVisitor<Path>(){
 						@Override
 						public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-							if(!attrs.isDirectory() && file.getFileName().toString().endsWith(".jar")){
-								candidates.add(file.toFile());
+							if(!attrs.isDirectory()){
+								String filename=file.getFileName().toString().toLowerCase();
+								if(filename.endsWith(".jar") || (sourceCode[0] && filename.endsWith(".zip")))
+									candidates.add(file.toFile());
 							}
 							return FileVisitResult.CONTINUE;
 						}
@@ -84,22 +110,16 @@ public class SearchJar extends AbstractHandler {
 								try {
 									JarFile jarFile=new JarFile(file);
 									monitor.subTask(jarFile.getName());
-//									if(fqClassName.contains("/")) {
-//										if(jarFile.getEntry(fqClassName)==null) {
-//											iterator.remove();
-//										}
-//									} else {
-										// Not a fully qualified name :(
-										boolean found=false;
-										for(JarEntry entry: Collections.list(jarFile.entries())) {
-											if(entry.getName().endsWith(fqClassName)) {
-												found=true;
-												break;
-											}
+									// Not a fully qualified name :(
+									boolean found=false;
+									for(JarEntry entry: Collections.list(jarFile.entries())) {
+										if(entry.getName().endsWith(fqClassName)) {
+											found=true;
+											break;
 										}
-										if(!found)
-											iterator.remove();
-//									}
+									}
+									if(!found)
+										iterator.remove();
 									jarFile.close();
 								} catch (IOException e) {
 									Activator.logError("", e); //$NON-NLS-1$
