@@ -52,13 +52,13 @@ public class EFavoritesQuickAssistProcessor implements IQuickAssistProcessor {
                             SimilarElement[] elements=SimilarElementsRequestor.findSimilarElement(context.getCompilationUnit(), node, kind);
                             for (int i=0; i < elements.length; i++) {
                                 SimilarElement elem=elements[i];
-                                if ((elem.getKind() & SimilarElementsRequestor.ALL_TYPES) != 0) {
+//                                if ((elem.getKind() & SimilarElementsRequestor.ALL_TYPES) != 0) {
                                     String fullName=elem.getName();
                                     String simpleName=StringUtils.substringAfterLast(fullName, ".");
                                     if (simpleName.equals(node.getIdentifier())) {
                                         proposals.add(new EFavoritesProposal(fullName));
                                     }
-                                }
+//                                }
                             }
                         }
                     }

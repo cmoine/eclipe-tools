@@ -2,7 +2,7 @@ package org.eclipse.etools.ei18n;
 
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 
-import org.eclipse.jdt.internal.corext.template.java.CodeTemplateContextType;
+import org.eclipse.jdt.internal.core.manipulation.CodeTemplateContextType;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.ui.IStartup;
 

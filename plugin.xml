@@ -833,68 +833,12 @@ private ${enclosing_type} () {
    <!-- ***************************************************************
                              QUICK SEARCH TEXT
    ********************************************************************-->
-      <extension
-         point="org.eclipse.ui.commands">
-      <category
-            name="Quick Search Category"
-            id="org.springsource.ide.eclipse.quicksearch.commands.category">
-      </category>
-      <command
-            name="Quick Search Command"
-            categoryId="org.springsource.ide.eclipse.quicksearch.commands.category"
-            id="org.springsource.ide.eclipse.quicksearch.commands.quicksearchCommand">
-      </command>
-      <!-- <command
-            defaultHandler="org.eclipse.etools.debug.CustomDebugHandler"
-            id="org.eclipse.etools.debug.CustomDebugHandler"
-            name="Advanced Add Breakpoint">
-      </command> -->
-   </extension>
 
    <!-- it seems that using the new and recommended way of contributing entries to existing menus
         doesn't work for the search menu.
         So we have to use the old mechanism using actionSets 
         See here http://stackoverflow.com/questions/7113380/how-to-extend-the-source-menu-in-eclipse-or-what-is-its-locationuri
     -->
-   <extension
-         point="org.eclipse.ui.actionSets">
-         
-      <actionSet
-            label="Quick Search ActionSet"
-            visible="true"
-            id="org.springsource.ide.eclipse.quicksearch.actionSet">
-            
-            
-	 	<!-- =================================================================== -->
-		<!-- Search Menu                                                         -->
-		<!-- =================================================================== -->
-		
-		<!-- weirdly, it seems we have to copy this code here because otherwise we
-		  sometimes get an error that the menu does not exist. Presumably this
-		  is because somehow our extensions are getting initialized before the
-		  extensions in other plugins that define the menu -->
-	  	<menu
-	        id="org.eclipse.search.menu"
-	        label="%searchMenu.label"
-	        path="navigate">
-			<groupMarker name="internalDialogGroup"/>   <!-- not to be used by clients  -->
-			<groupMarker name="dialogGroup"/>           <!-- to be used by clients      -->
-			<separator name="fileSearchContextMenuActionsGroup"/> <!-- to be used by clients      -->
-	     	<separator name="contextMenuActionsGroup"/> <!-- to be used by clients -->
-	     	<separator name="occurencesActionsGroup"/> <!-- to be used by clients -->
-	     	<separator name="extraSearchGroup"/> <!-- to be used by clients -->
-	  	</menu>
-            
-         <action
-               id="org.springsource.ide.eclipse.quicksearch.commands.quicksearchAction"
-               class="org.springsource.ide.eclipse.commons.quicksearch.ui.QuickSearchAction"
-               definitionId="org.springsource.ide.eclipse.quicksearch.commands.quicksearchCommand"
-               label="Quick Search"
-               menubarPath="org.eclipse.search.menu/extraSearchGroup"
-               tooltip="Search for Text pattern in the workspace">
-         </action>
-      </actionSet>
-   </extension>
    
 <!-- This doesn't work unfortunately... 
   <extension point="org.eclipse.ui.menus">
@@ -908,31 +852,7 @@ private ${enclosing_type} () {
    
    <!-- Allthough we have an action defined, it seems the action isn't always working. So for good measure
        also define a handler -->
-   <extension
-         point="org.eclipse.ui.handlers">
-      <handler
-            commandId="org.springsource.ide.eclipse.quicksearch.commands.quicksearchCommand"
-            class="org.springsource.ide.eclipse.commons.quicksearch.ui.QuickSearchHandler">
-      </handler>
-   </extension>
    
 <!-- Define keybinding -->   
-   <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="org.springsource.ide.eclipse.quicksearch.commands.quicksearchCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            sequence="M1+ALT+F"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
-      </key>
-   </extension>
 
-	<extension
-	      point = "org.eclipse.ui.preferencePages">
-	       <page id="org.springsource.ide.eclipse.commons.quicksearch.PreferencesPage"
-		        class="org.springsource.ide.eclipse.commons.quicksearch.ui.QuickSearchPreferencesPage"
-	            category="org.eclipse.etools.EtoolsPreferencePage"
-	            name="Quick Search">
-	       </page>
-	</extension>
 </plugin>
